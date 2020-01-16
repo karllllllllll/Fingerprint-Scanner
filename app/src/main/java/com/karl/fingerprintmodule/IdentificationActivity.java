@@ -14,8 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.digitalpersona.uareu.*;
 import com.digitalpersona.uareu.Reader.CaptureResult;
+import com.digitalpersona.uareu.dpfj.FmdImpl;
 
 import java.text.DecimalFormat;
+
+import static com.karl.fingerprintmodule.R.layout.activity_engine;
 
 public class IdentificationActivity extends Activity
 {
@@ -26,7 +29,9 @@ public class IdentificationActivity extends Activity
     private Reader m_reader = null;
     private int m_DPI = 0;
     private Bitmap m_bitmap = null;
+    private Bitmap m_bitmap_2 = null;
     private ImageView m_imgView;
+    private ImageView m_imgView2;
     private TextView m_selectedDevice;
     private TextView m_title;
     private boolean m_reset = false;
@@ -59,9 +64,12 @@ public class IdentificationActivity extends Activity
         m_selectedDevice.setText("Device: " + m_deviceName);
 
         m_imgView = (ImageView) findViewById(R.id.bitmap_image);
+        m_imgView2 = (ImageView) findViewById(R.id.bitmap_image_2);
         m_bitmap = Globals.GetLastBitmap();
         if (m_bitmap == null) m_bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.black);
+        if (m_bitmap_2 == null) m_bitmap_2 = BitmapFactory.decodeResource(getResources(), R.drawable.black);
         m_imgView.setImageBitmap(m_bitmap);
+        m_imgView2.setImageBitmap(m_bitmap);
         m_back = (Button) findViewById(R.id.back);
 
         m_back.setOnClickListener(new View.OnClickListener()
@@ -81,7 +89,7 @@ public class IdentificationActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_engine);
+        setContentView(activity_engine);
         m_textString = "Place your thumb on the reader";
         initializeActivity();
         // initiliaze dp sdk
@@ -133,9 +141,10 @@ public class IdentificationActivity extends Activity
                         m_enginError = "";
 
                         // save bitmap image locally
-                        m_bitmap = Globals.GetBitmapFromRaw(cap_result.image.getViews()[0].getImageData(), cap_result.image.getViews()[0].getWidth(), cap_result.image.getViews()[0].getHeight());
+//                        m_bitmap = Globals.GetBitmapFromRaw(cap_result.image.getViews()[0].getImageData(), cap_result.image.getViews()[0].getWidth(), cap_result.image.getViews()[0].getHeight());
                         if (m_fmd1 == null)
                         {
+                            m_bitmap = Globals.GetBitmapFromRaw(cap_result.image.getViews()[0].getImageData(), cap_result.image.getViews()[0].getWidth(), cap_result.image.getViews()[0].getHeight());
                             m_fmd1 = m_engine.CreateFmd(cap_result.image, Fmd.Format.ANSI_378_2004);
                         }
 //                        else if (m_fmd2 == null)
@@ -152,13 +161,18 @@ public class IdentificationActivity extends Activity
 //                        }
                         else
                         {
+                            m_bitmap_2 = Globals.GetBitmapFromRaw(cap_result.image.getViews()[0].getImageData(), cap_result.image.getViews()[0].getWidth(), cap_result.image.getViews()[0].getHeight());
+
 //                            FINGERPRINT FOR CHECKING
                             Fmd m_temp = m_engine.CreateFmd(cap_result.image, Fmd.Format.ANSI_378_2004);
-//                            FINGERPRINT FOR CHECKING
 
 //                            Fmd[] m_fmds_temp = new Fmd[] {m_fmd1, m_fmd2, m_fmd3, m_fmd4};
+
+
+
                             Fmd[] m_fmds_temp = new Fmd[] {m_fmd1, m_fmd1, m_fmd1, m_fmd1};
 
+//                            Returns Array of Candidate Object
                             results = m_engine.Identify(m_temp, 0, m_fmds_temp, 100000, 2);
 
                             if (results.length != 0)
@@ -177,6 +191,8 @@ public class IdentificationActivity extends Activity
                     }
                     catch (Exception e)
                     {
+
+
                         m_enginError = e.toString();
                         Log.w("UareUSampleJava", "Engine error: " + e.toString());
                     }
@@ -264,6 +280,7 @@ public class IdentificationActivity extends Activity
     public void UpdateGUI()
     {
         m_imgView.setImageBitmap(m_bitmap);
+        m_imgView2.setImageBitmap(m_bitmap_2);
         m_imgView.invalidate();
         m_text_conclusion.setText(m_text_conclusionString);
         m_text.setText(m_textString);
@@ -295,7 +312,7 @@ public class IdentificationActivity extends Activity
     public void onConfigurationChanged(Configuration newConfig)
     {
         super.onConfigurationChanged(newConfig);
-        setContentView(R.layout.activity_engine);
+        setContentView(activity_engine);
         initializeActivity();
     }
 }

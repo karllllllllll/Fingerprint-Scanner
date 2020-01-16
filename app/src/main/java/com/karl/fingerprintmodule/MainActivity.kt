@@ -1,6 +1,7 @@
 package com.karl.fingerprintmodule
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.app.PendingIntent
 import android.content.*
 import android.hardware.usb.UsbDevice
@@ -34,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         m_getReader = findViewById(R.id.get_reader);
         m_captureFingerprint = findViewById(R.id.capture_fingerprint);
         m_identification = findViewById(R.id.identification);
-
 
         setButtonsEnabled(false)
 
@@ -118,6 +118,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var alertDialog:Dialog;
+
     private fun displayReaderNotFound()
     {
         m_selectedDevice.setText("Device: (No Reader Selected)");
@@ -130,13 +132,12 @@ class MainActivity : AppCompatActivity() {
         alertDialogBuilder.setMessage("Plug in a reader and try again.").setCancelable(false).setPositiveButton("Ok",
             object : DialogInterface.OnClickListener {
                 override fun onClick(dialog: DialogInterface?, which: Int) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-
+                    alertDialog.dismiss();
                 }
 
             })
 
-        val alertDialog = alertDialogBuilder.create();
+        alertDialog = alertDialogBuilder.create();
         alertDialog.show()
     }
 
@@ -147,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 //        m_captureFingerprint.setEnabled(enabled);
 //        m_enrollment.setEnabled(enabled);
 //        m_verification.setEnabled(enabled);
-//        m_identification.setEnabled(enabled);
+        m_identification.setEnabled(enabled);
     }
 
     protected fun CheckDevice()
