@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         m_captureFingerprint = findViewById(R.id.capture_fingerprint);
         m_identification = findViewById(R.id.identification);
 
-        setButtonsEnabled(false)
+        //setButtonsEnabled(false)
 
         m_getReader.setOnClickListener {
 
