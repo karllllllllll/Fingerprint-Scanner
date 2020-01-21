@@ -112,13 +112,13 @@ public class IdentificationActivity extends Activity {
         });
 
 
-        //userBiometrixList = retrieveData();
+        userBiometrixList = retrieveData();
+        //String name = userBiometrixList.get(1).getName();
         UpdateGUI();
-        createTestData();
+        //createTestData();
     }
 
     private Boolean check = false;
-    private ArrayList<Fmd> fmdArrayList = new ArrayList<>();
     private ArrayList<userBiometrix> userBiometrixList = new ArrayList<>();
     Fmd[] m_fmds_temp;
 
@@ -169,16 +169,17 @@ public class IdentificationActivity extends Activity {
                         // save bitmap image locally
                         //if (m_fmd1 == null)
                         if (!check) {
-                            //Inage
+                            //Image
                             m_bitmap = Globals.GetBitmapFromRaw(cap_result.image.getViews()[0].getImageData(), cap_result.image.getViews()[0].getWidth(), cap_result.image.getViews()[0].getHeight());
 
                             //FMD Object
                             m_fmd1 = m_engine.CreateFmd(cap_result.image, Fmd.Format.ANSI_378_2004);
 
-                            fmdArrayList.add(m_fmd1);
-                            addData(new userBiometrix("Karl " + fmdArrayList.size(), m_fmd1));
+                            //fmdArrayList.add(m_fmd1);
+                            //addData(new userBiometrix("Karl", m_fmd1));
 
-                            UpdateGUI();
+                            createTestData();
+
                         } else {
                             m_bitmap_2 = Globals.GetBitmapFromRaw(cap_result.image.getViews()[0].getImageData(), cap_result.image.getViews()[0].getWidth(), cap_result.image.getViews()[0].getHeight());
 
@@ -193,7 +194,6 @@ public class IdentificationActivity extends Activity {
 
                             if (results.length != 0) {
                                 m_score = m_engine.Compare(m_fmds_temp[results[0].fmd_index], 0, m_temp, 0);
-
                             } else {
                                 m_score = -1;
                             }
@@ -219,21 +219,7 @@ public class IdentificationActivity extends Activity {
                             if (m_text_conclusionString.length() == 0) {
                                 String conclusion = "";
                                 if (results.length > 0) {
-//                                    switch (results[0].fmd_index)
-//                                    {
-//                                        case 0:
-//                                            conclusion = "Thumb matched";
-//                                            break;
-//                                        case 1:
-//                                            conclusion = "Index finger matched";
-//                                            break;
-//                                        case 2:
-//                                            conclusion = "Middle finger matched";
-//                                            break;
-//                                        case 3:
-//                                            conclusion = "Ring finger matched";
-//                                            break;
-//                                    }
+
                                     //conclusion = fmdArrayList.get(results[0].fmd_index).toString();
                                     conclusion = userBiometrixList.get(results[0].fmd_index).getName();
 
@@ -318,25 +304,10 @@ public class IdentificationActivity extends Activity {
     //String location = dir.getAbsolutePath() + "/Thumbprints/employeeBiometrix";
     String location = dir + "/Thumbprints/employeeBiometrix.txt";
 
-
-    private void createTestData () {
-
-        try {
-
-            FileOutputStream fos = new FileOutputStream(location);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(new test());
-            oos.close();
-            fos.close();
-        } catch (IOException ioe) {
-
-            ioe.printStackTrace();
-        }
-    }
-
     private void addData(userBiometrix ub) {
 
         ArrayList<userBiometrix> employees = retrieveData();
+        employees.add(ub);
         employees.add(ub);
         employees.add(ub);
         employees.add(ub);
@@ -350,6 +321,8 @@ public class IdentificationActivity extends Activity {
             fos.close();
         } catch (IOException ioe) {
 
+            m_text_conclusionString = ioe.toString();
+            UpdateGUI();
             ioe.printStackTrace();
         }
     }
@@ -357,24 +330,26 @@ public class IdentificationActivity extends Activity {
 
     private ArrayList<userBiometrix> retrieveData() {
 
-        userBiometrixList.clear();
+        ArrayList<userBiometrix> innerList = new ArrayList<>();
 
         try {
             FileInputStream fis = new FileInputStream(location);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            userBiometrixList = (ArrayList<userBiometrix>) ois.readObject();
+            innerList = (ArrayList<userBiometrix>) ois.readObject();
             ois.close();
             fis.close();
         } catch (IOException ioe) {
 
-            return userBiometrixList;
+            m_text_conclusionString = ioe.toString();
+            return innerList;
         } catch (ClassNotFoundException c) {
 
-            return userBiometrixList;
+            m_text_conclusionString = c.toString();
+            return innerList;
         } finally {
 
             UpdateGUI();
-            return userBiometrixList;
+            return innerList;
         }
     }
 
@@ -401,37 +376,43 @@ public class IdentificationActivity extends Activity {
         return innerList;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void createTestData() {
 
-        verifyStoragePermissions(this);
+        ArrayList<userBiometrix> employees = new ArrayList<>();
+        employees.add(new userBiometrix("karl", m_fmd1));
+        employees.add(new userBiometrix("karl", m_fmd1));
+        employees.add(new userBiometrix("karl", m_fmd1));
+        employees.add(new userBiometrix("karl", m_fmd1));
+        employees.add(new userBiometrix("karl", m_fmd1));
+
+        try {
+
+            FileOutputStream fos = new FileOutputStream(location);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(employees);
+            oos.close();
+            fos.close();
+        } catch (IOException ioe) {
+
+            ioe.printStackTrace();
+        }
     }
 
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
+    private class userBiometrix implements Serializable {
+        transient String name;
+        transient Fmd fingerPrint;
 
-    /**
-     * Checks if the app has permission to write to device storage
-     *
-     * If the app does not has permission then the user will be prompted to grant permissions
-     *
-     * @param activity
-     */
-    public static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        userBiometrix(String name, Fmd fmd){
+            this.name = name;
+            this.fingerPrint = fmd;
+        }
 
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
+        public String getName() {
+            return this.name;
+        }
+
+        public Fmd getFingerPrint() {
+            return this.fingerPrint;
         }
     }
 }

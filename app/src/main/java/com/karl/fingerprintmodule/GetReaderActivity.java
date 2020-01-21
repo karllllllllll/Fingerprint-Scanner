@@ -96,4 +96,5 @@ public class GetReaderActivity extends Activity
         onCreate(savedInstanceState);
         super.onConfigurationChanged(newConfig);
     }
+
 }

@@ -17,33 +17,44 @@ import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbHost
 
 class MainActivity : AppCompatActivity() {
 
-    private val GENERAL_ACTIVITY_RESULT = 1
-
-    private var m_deviceName = ""
-    private lateinit var m_selectedDevice:TextView
-
-    private lateinit var m_getReader: Button
-    private lateinit var m_captureFingerprint: Button
-    private lateinit var m_identification: Button
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        init()
+        initViews()
+        setListeners()
+        setButtonsEnabled(false)
+    }
+
+    private fun init() {
+
+        ACTION_USB_PERMISSION = Static.ACTION_USB_PERMISSION;
+    }
+
+    private lateinit var m_selectedDevice: TextView
+    private lateinit var m_getReader: Button
+    private lateinit var m_captureFingerprint: Button
+    private lateinit var m_identification: Button
+
+    private fun initViews() {
 
         m_selectedDevice = findViewById(R.id.selected_device);
         m_getReader = findViewById(R.id.get_reader);
         m_captureFingerprint = findViewById(R.id.capture_fingerprint);
         m_identification = findViewById(R.id.identification);
+    }
 
-        //setButtonsEnabled(false)
+    private var m_deviceName = ""
 
+    private fun setListeners() {
         m_getReader.setOnClickListener {
 
             val i = Intent(
-            //this@UareUSampleJava
-            this
-            , GetReaderActivity::class.java)
+                //this@UareUSampleJava
+                this
+                , GetReaderActivity::class.java
+            )
             i.putExtra("device_name", m_deviceName)
             startActivityForResult(i, 1)
         }
@@ -51,7 +62,8 @@ class MainActivity : AppCompatActivity() {
         m_captureFingerprint.setOnClickListener {
             val i = Intent(
                 this,
-                CaptureFingerprintActivity::class.java)
+                CaptureFingerprintActivity::class.java
+            )
             i.putExtra("device_name", m_deviceName);
             startActivityForResult(i, 1);
         }
@@ -59,19 +71,26 @@ class MainActivity : AppCompatActivity() {
         m_identification.setOnClickListener {
             val i = Intent(
                 this,
-                IdentificationActivity::class.java)
+                //IdentificationActivity::class.java)
+                RegisterActivity::class.java
+            )
             i.putExtra("device_name", m_deviceName);
             startActivityForResult(i, 1);
         }
     }
 
+    protected fun setButtonsEnabled(enabled: Boolean) {
+
+        m_identification.setEnabled(enabled);
+    }
+
+    private val GENERAL_ACTIVITY_RESULT = 1
     private var m_reader: Reader? = null;
-    private val ACTION_USB_PERMISSION = "com.digitalpersona.uareu.dpfpddusbhost.USB_PERMISSION"
+    private var ACTION_USB_PERMISSION: String? = null;
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
-        if (data == null)
-        {
+        if (data == null) {
             displayReaderNotFound()
             return;
         }
@@ -80,113 +99,81 @@ class MainActivity : AppCompatActivity() {
 
         m_deviceName = data.extras.getString("device_name")
 
-        if (requestCode == GENERAL_ACTIVITY_RESULT)
-        {
+        if (requestCode == GENERAL_ACTIVITY_RESULT) {
 
-            if((m_deviceName != null) && !m_deviceName.isEmpty())
-            {
+            if ((m_deviceName != null) && !m_deviceName.isEmpty()) {
                 m_selectedDevice.setText("Device: " + m_deviceName);
 
                 try {
-                    val applContext = getApplicationContext();
+                    val applContext = applicationContext;
                     m_reader = Globals.getInstance().getReader(m_deviceName, applContext);
 
 
                     val mPermissionIntent: PendingIntent
-                        mPermissionIntent = PendingIntent.getBroadcast(applContext, 0,  Intent(ACTION_USB_PERMISSION), 0);
-                        val filter = IntentFilter(ACTION_USB_PERMISSION);
-                        applContext.registerReceiver(mUsbReceiver, filter);
+                    mPermissionIntent = PendingIntent.getBroadcast(
+                        applContext,
+                        0,
+                        Intent(ACTION_USB_PERMISSION),
+                        0
+                    );
+                    val filter = IntentFilter(ACTION_USB_PERMISSION);
+                    applContext.registerReceiver(mUsbReceiver, filter);
 
-                        if(DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(applContext, mPermissionIntent, m_deviceName))
-                        {
-                            CheckDevice();
-                        }
+                    if (DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(
+                            applContext,
+                            mPermissionIntent,
+                            m_deviceName
+                        )) {
+                        CheckDevice();
+                    }
 
-                } catch (e1 : UareUException)
-                {
+                } catch (e1: UareUException) {
+                    displayReaderNotFound();
+                } catch (e: DPFPDDUsbException) {
                     displayReaderNotFound();
                 }
-                catch (e : DPFPDDUsbException)
-                {
-                    displayReaderNotFound();
-                }
 
-            } else
-            {
+            } else {
                 displayReaderNotFound();
             }
         }
     }
 
-    private lateinit var alertDialog:Dialog;
+    private lateinit var alertDialog: Dialog;
 
-    private fun displayReaderNotFound()
-    {
+    private fun displayReaderNotFound() {
         m_selectedDevice.setText("Device: (No Reader Selected)");
         setButtonsEnabled(false);
         val alertDialogBuilder = AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Reader Not Found");
 
+        alertDialogBuilder.setMessage("Plug in a reader and try again.").setCancelable(false)
+            .setPositiveButton("Ok",
+                object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        alertDialog.dismiss();
+                    }
 
-
-        alertDialogBuilder.setMessage("Plug in a reader and try again.").setCancelable(false).setPositiveButton("Ok",
-            object : DialogInterface.OnClickListener {
-                override fun onClick(dialog: DialogInterface?, which: Int) {
-                    alertDialog.dismiss();
-                }
-
-            })
+                })
 
         alertDialog = alertDialogBuilder.create();
         alertDialog.show()
     }
 
-    protected fun setButtonsEnabled(enabled: Boolean)
-    {
-//        m_getCapabilities.setEnabled(enabled);
-//        m_streamImage.setEnabled(enabled);
-//        m_captureFingerprint.setEnabled(enabled);
-//        m_enrollment.setEnabled(enabled);
-//        m_verification.setEnabled(enabled);
-        m_identification.setEnabled(enabled);
-    }
-
-    protected fun CheckDevice()
-    {
-        try
-        {
-            m_reader!!.Open(Reader.Priority.EXCLUSIVE);
-            val cap = m_reader!!.GetCapabilities();
-            setButtonsEnabled(true);
-//            setButtonsEnabled_Capture(cap.can_capture);
-//            setButtonsEnabled_Stream(cap.can_stream);
-            m_reader!!.Close();
-        }
-        catch ( e1 : UareUException)
-        {
-            displayReaderNotFound();
-        }
-    }
-
-    private val  mUsbReceiver = object: BroadcastReceiver() {
+    private val mUsbReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent!!.getAction();
-            if (ACTION_USB_PERMISSION.equals(action))
-            {
-                synchronized (this)
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized(this)
                 {
                     val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false))
-                    {
-                        if(device != null)
-                        {
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if (device != null) {
                             //call method to set up device communication
                             CheckDevice();
                         }
-                    }
-                    else
-                    {
+                    } else {
                         setButtonsEnabled(false);
                     }
                 }
@@ -194,4 +181,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    protected fun CheckDevice() {
+        try {
+            m_reader!!.Open(Reader.Priority.EXCLUSIVE);
+            val cap = m_reader!!.GetCapabilities();
+            setButtonsEnabled(true);
+            m_reader!!.Close();
+        } catch (e1: UareUException) {
+            displayReaderNotFound();
+        }
+    }
+
 }
+
