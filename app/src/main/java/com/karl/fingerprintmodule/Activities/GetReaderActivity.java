@@ -1,4 +1,4 @@
-package com.karl.fingerprintmodule;
+package com.karl.fingerprintmodule.Activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import com.digitalpersona.uareu.ReaderCollection;
 import com.digitalpersona.uareu.UareUException;
+import com.karl.fingerprintmodule.Globals;
+import com.karl.fingerprintmodule.R;
 
 public class GetReaderActivity extends Activity
 {

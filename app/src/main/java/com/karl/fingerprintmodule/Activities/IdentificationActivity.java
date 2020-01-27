@@ -1,4 +1,4 @@
-package com.karl.fingerprintmodule;
+package com.karl.fingerprintmodule.Activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.digitalpersona.uareu.*;
 import com.digitalpersona.uareu.Reader.CaptureResult;
+import com.karl.fingerprintmodule.Globals;
+import com.karl.fingerprintmodule.R;
 
 import java.io.File;
 import java.io.FileInputStream;

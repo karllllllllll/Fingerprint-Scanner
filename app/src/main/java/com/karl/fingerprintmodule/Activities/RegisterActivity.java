@@ -1,10 +1,10 @@
-package com.karl.fingerprintmodule;
+package com.karl.fingerprintmodule.Activities;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -18,41 +18,45 @@ import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.UareUGlobal;
+import com.karl.fingerprintmodule.Globals;
+import com.karl.fingerprintmodule.R;
+import com.karl.fingerprintmodule.Result;
+import com.karl.fingerprintmodule.ViewModels.FmdViewModel;
+import com.karl.fingerprintmodule.employeeBiometrix;
+import com.karl.fingerprintmodule.fingerprint;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
 import android.util.Base64;
 
 
-public class RegisterActivity extends Activity {
+public class RegisterActivity extends AppCompatActivity {
+
+    private AppCompatActivity activity;
+    private FmdViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register_fingerprint);
+        setContentView(R.layout.fingerprint_register_activity);
+
+        activity = this;
+        viewModel = ViewModelProviders.of(activity).get(FmdViewModel.class);
 
         initViews();
         initReader();
 
         runThread();
         setListeners();
-
+        viewModel.retrieveFingerPrints();
     }
 
     private ImageView iv_thumbprint;
     private TextView tv_message;
     private EditText et_name;
     private Button btn_register;
-    private Button btn_find;
+    //private Button btn_find;
     private TextView tv_debugger;
 
     private void initViews() {
@@ -61,7 +65,7 @@ public class RegisterActivity extends Activity {
         tv_message = findViewById(R.id.tv_message);
         et_name = findViewById(R.id.et_name);
         btn_register = findViewById(R.id.btn_register);
-        btn_find = findViewById(R.id.btn_find);
+        //btn_find = findViewById(R.id.btn_find);
         tv_debugger = findViewById(R.id.tv_debugger);
     }
 
@@ -107,6 +111,23 @@ public class RegisterActivity extends Activity {
                     fmdArrayList.add(new employeeBiometrix(name, currentFMD));
                     fmdList.add(currentFMD);
 
+
+                    // Convert byte[] to String for network transfer
+                    String encoded = Base64.encodeToString(cap_result.image.getViews()[0].getImageData(), Base64.DEFAULT);
+                    //Decodes converted string back
+                    byte[] data = Base64.decode(encoded, Base64.DEFAULT);
+
+                    viewModel.saveFingerprint(
+                            new fingerprint(
+                                    name,
+                                    encoded,
+                                    cap_result.image.getViews()[0].getWidth(),
+                                    cap_result.image.getViews()[0].getHeight(),
+                                    cap_result.image.getImageResolution(),
+                                    cap_result.image.getCbeffId()
+                            ));
+
+
                     resetRegistration();
                 } else {
                     tv_message.setText("Please fill all fields");
@@ -114,12 +135,12 @@ public class RegisterActivity extends Activity {
             }
         });
 
-        btn_find.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                check = true;
-            }
-        });
+//        btn_find.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                check = true;
+//            }
+//        });
     }
 
     String tv_debugger_text = "";
@@ -224,29 +245,31 @@ public class RegisterActivity extends Activity {
 
                             searchFMD = m_engine.CreateFmd(cap_result.image, Fmd.Format.ANSI_378_2004);
 
+                            Result r = viewModel.findUserFMD(searchFMD);
+                            tv_debugger_text = r.getMessage();
 
-                            //fmdCheckList = createFMDListFromArrayList();
-                            fmdCheckList = createFMDArrayFromArrayList();
 
-                            results = m_engine.Identify(searchFMD, 0, fmdCheckList, 100000, 2);
-
-                            if (results.length != 0) {
-
-                                m_score = m_engine.Compare(fmdCheckList[results[0].fmd_index], 0, searchFMD, 0);
-
-                                String message = fmdArrayList.get(results[0].fmd_index).getName();
-                                if (m_score != -1) {
-
-                                    DecimalFormat formatting = new DecimalFormat("##.######");
-                                    tv_debugger_text = message + "\n (Dissimilarity Score: " + m_score + ", False match rate: " + Double.valueOf(formatting.format((double) m_score / 0x7FFFFFFF)) + ")";
-                                } else {
-                                    tv_debugger_text = message;
-                                }
-                            } else {
-
-                                m_score = -1;
-                                tv_debugger_text = "No Match Found";
-                            }
+//                            fmdCheckList = createFMDArrayFromArrayList();
+//
+//                            results = m_engine.Identify(searchFMD, 0, fmdCheckList, 100000, 2);
+//
+//                            if (results.length != 0) {
+//
+//                                m_score = m_engine.Compare(fmdCheckList[results[0].fmd_index], 0, searchFMD, 0);
+//
+//                                String message = fmdArrayList.get(results[0].fmd_index).getName();
+//                                if (m_score != -1) {
+//
+//                                    DecimalFormat formatting = new DecimalFormat("##.######");
+//                                    tv_debugger_text = message + "\n (Dissimilarity Score: " + m_score + ", False match rate: " + Double.valueOf(formatting.format((double) m_score / 0x7FFFFFFF)) + ")";
+//                                } else {
+//                                    tv_debugger_text = message;
+//                                }
+//                            } else {
+//
+//                                m_score = -1;
+//                                tv_debugger_text = "No Match Found";
+//                            }
 
                             currentFMD = null;
                             searchFMD = null;

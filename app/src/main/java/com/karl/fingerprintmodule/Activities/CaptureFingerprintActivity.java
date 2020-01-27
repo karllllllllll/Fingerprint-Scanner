@@ -1,4 +1,4 @@
-package com.karl.fingerprintmodule;
+package com.karl.fingerprintmodule.Activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Reader;
+import com.karl.fingerprintmodule.Globals;
+import com.karl.fingerprintmodule.R;
 
 public class CaptureFingerprintActivity extends Activity
 {
