@@ -16,7 +16,9 @@ import com.digitalpersona.uareu.Engine;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
+import com.karl.fingerprintmodule.Models.User;
 import com.karl.fingerprintmodule.Result;
+import com.karl.fingerprintmodule.Static;
 import com.karl.fingerprintmodule.fingerprint;
 import com.karl.fingerprintmodule.volleyQueue;
 
@@ -43,9 +45,7 @@ public class FmdViewModel extends AndroidViewModel {
                 getRequestQueue();
     }
 
-    private String url = "http://192.168.137.1/Biometrix/api/fmds";
-
-    public void saveFingerprint(fingerprint fp) {
+    public void saveFingerprint(fingerprint fp, User user) {
 
         Map<String, String> params = new HashMap<>();
         params.put("userID", fp.getUserID());
@@ -54,10 +54,12 @@ public class FmdViewModel extends AndroidViewModel {
         params.put("height", String.valueOf(fp.getHeight()));
         params.put("resolution", String.valueOf(fp.getResolution()));
         params.put("cbeff_id", String.valueOf(fp.getCbeff_id()));
+        params.put("f_name", user.getF_name());
+        params.put("l_name", user.getL_name());
         JSONObject parameters = new JSONObject(params);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, parameters, new Response.Listener<JSONObject>() {
+                (Request.Method.POST, Static.URL_BIOMETRIX, parameters, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -80,7 +82,7 @@ public class FmdViewModel extends AndroidViewModel {
     public void retrieveFingerPrints() {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, Static.URL_BIOMETRIX, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -135,7 +137,7 @@ public class FmdViewModel extends AndroidViewModel {
                             Fmd.Format.ANSI_378_2004);
 
                     innerFMDList[i] = fmd;
-                    innerIDList[i] = fingerPrintsObj.getString("userID");
+                    innerIDList[i] = fingerPrintsObj.getString("f_name") + " " + fingerPrintsObj.getString("l_name");
                 }
 
                 fmdChecklist = innerFMDList;
@@ -194,3 +196,4 @@ public class FmdViewModel extends AndroidViewModel {
         return result;
     }
 }
+
