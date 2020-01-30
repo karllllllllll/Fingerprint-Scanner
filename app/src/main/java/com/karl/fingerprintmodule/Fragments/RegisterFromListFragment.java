@@ -58,7 +58,8 @@ public class RegisterFromListFragment extends Fragment implements RecyclerViewCl
 
         final RecyclerViewClickListener listener = this;
 
-        viewModel.loginApi("makati@zol.com", "tk123456", "zolvere");
+        //viewModel.loginApi("makati@zol.com", "tk123456", "zolvere");
+        viewModel.loginApi("hprodriguez@iplusonline.com", "password123", "demo");
         viewModel.getUserArrayList().observe(this, new Observer<ArrayList<User>>() {
             @Override
             public void onChanged(@Nullable ArrayList<User> users) {
@@ -66,7 +67,7 @@ public class RegisterFromListFragment extends Fragment implements RecyclerViewCl
 
                     mAdapter = new UsersAdapter(users, ctx, listener);
                 } else {
-                    mAdapter = new UsersAdapter(null, ctx, listener);
+                    mAdapter = new UsersAdapter(new ArrayList<User>(), ctx, listener);
                 }
                 recyclerView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();

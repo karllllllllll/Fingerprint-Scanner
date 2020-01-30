@@ -12,15 +12,19 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.karl.fingerprintmodule.Helper;
 import com.karl.fingerprintmodule.Models.User;
+import com.karl.fingerprintmodule.Result;
 import com.karl.fingerprintmodule.Static;
 import com.karl.fingerprintmodule.volleyQueue;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class TimekeepingViewModel extends AndroidViewModel {
@@ -32,6 +36,8 @@ public class TimekeepingViewModel extends AndroidViewModel {
     private MutableLiveData<ArrayList<User>> userArrayList = new MutableLiveData<>();
 
     public String deviceName = "";
+    private String link = "demo";
+
 
     public MutableLiveData<ArrayList<User>> getUserArrayList() {
 
@@ -46,34 +52,39 @@ public class TimekeepingViewModel extends AndroidViewModel {
                 getRequestQueue();
     }
 
-    public void loginApi(String email, String password, String link) {
+    public void loginApi(String email, String password, final String link) {
 
         HashMap<String, String> params = new HashMap<>();
+
         params.put("username", email);
         params.put("password", password);
         params.put("link", link);
 
+        JSONObject joParams = new JSONObject(params);
+
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, Static.URL_LOGIN, new JSONObject(params), new Response.Listener<JSONObject>() {
+                (Request.Method.POST, Static.URL_LOGIN, joParams, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
 
-                        setSessions(response);
+                        setSessions(response, link);
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // TODO: Handle error
-                        Toast.makeText(app.getBaseContext(), error.toString(), Toast.LENGTH_LONG).show();
+
+                        Toast.makeText(app.getBaseContext(), error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
         queue.add(jsonObjectRequest);
     }
 
-    private void setSessions(JSONObject response) {
+    private void setSessions(JSONObject response, String link) {
 
         try {
 
@@ -108,10 +119,7 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
                 String full_name = fname + " " + lname;
 
-
-                //Toast.makeText(app.getBaseContext(), "Success!", Toast.LENGTH_LONG).show();
-
-                getUsers(user_branch_object.getString("branch_id"), api_token, "zolvere", d, t, token);
+                getUsers(user_branch_object.getString("branch_id"), api_token, link, d, t, token);
 
             } else {
                 Toast.makeText(app.getBaseContext(), "Error!", Toast.LENGTH_LONG).show();
@@ -122,6 +130,8 @@ public class TimekeepingViewModel extends AndroidViewModel {
     }
 
     private void getUsers(String location_id, String api_token, final String link, final String d, final String t, final String token) {
+
+
         String url = Static.URL_EMPLOYEES + location_id + "?api_token=" + api_token + "&link=" + link;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -157,11 +167,13 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
     private void addToList(JSONObject response) {
 
+
         ArrayList<User> innerList = new ArrayList<>();
 
         try {
 
             if (response.has("status") && response.getString("status").equals("success")) {
+
 
                 JSONArray jsonArray = response.getJSONArray("msg");
 
@@ -192,10 +204,22 @@ public class TimekeepingViewModel extends AndroidViewModel {
                 innerList = null;
             }
         } catch (Exception e) {
-            Toast.makeText(app.getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
+
+            String msg =  e.toString();
+
+            try {
+                if(response.has("msg")){
+                    msg = response.getString("msg");
+                }
+            } catch (JSONException ex) {
+                msg = ex.toString();
+            }
+
+            Toast.makeText(app.getBaseContext(), msg, Toast.LENGTH_LONG).show();
             innerList = null;
         }
 
+        Toast.makeText(app.getBaseContext(), innerList.toString(), Toast.LENGTH_LONG).show();
         userArrayList.setValue(innerList);
     }
 
@@ -206,4 +230,71 @@ public class TimekeepingViewModel extends AndroidViewModel {
         else
             return null;
     }
+
+    private MutableLiveData<Result> clockResult = new MutableLiveData<>();
+
+    public MutableLiveData<Result> getClockResult() {
+        return this.clockResult;
+    }
+
+    public User findUserByUserID(String userID) {
+
+        ArrayList<User> innerList = userArrayList.getValue();
+        User user = null;
+
+        if (innerList != null) {
+
+            clockResult.postValue(new Result(Static.API_STATUS_SUCCESS, innerList.toString()));
+
+            for (User u : innerList) {
+                if (u.getId().equals(userID)) {
+                    user = u;
+                }
+            }
+        }
+
+        if (user != null) {
+
+            clockResult.postValue(new Result(Static.API_STATUS_SUCCESS, user.getId()));
+
+        } else {
+            clockResult.postValue(new Result(Static.API_STATUS_FAILED, "Something went wrong"));
+        }
+
+        return user;
+    }
+
+    //public void sendClockInOut(final HashMap<String, String> params,final HashMap<String, String> headers) {
+    public void sendClockInOut(User userID) {
+
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+//                (Request.Method.POST, Static.URL_CLOCK_IN, new JSONObject(params), new Response.Listener<JSONObject>() {
+//
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//
+//                        Toast.makeText(app.getBaseContext(), response.toString(), Toast.LENGTH_LONG).show();
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        // TODO: Handle error
+//                        Toast.makeText(app.getBaseContext(), error.toString(), Toast.LENGTH_LONG).show();
+//                    }
+//                }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                return headers;
+//            }
+//
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                return params;
+//            }
+//        };
+//
+//        queue.add(jsonObjectRequest);
+    }
+
 }

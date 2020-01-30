@@ -1,6 +1,6 @@
 package com.karl.fingerprintmodule
 
-data class Result (
+open class Result (
 
     var status:String,
     var message: String

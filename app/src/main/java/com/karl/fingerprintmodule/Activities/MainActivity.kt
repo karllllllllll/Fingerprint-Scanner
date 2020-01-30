@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.CardView
@@ -195,11 +196,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun getReaders() {
 
-        Toast.makeText(
-            this,
-            "Dumaan.",
-            Toast.LENGTH_LONG
-        ).show();
+//        Toast.makeText(
+//            this,
+//            "Dumaan.",
+//            Toast.LENGTH_LONG
+//        ).show()
 
 
         val rc = viewModel.readers.value
@@ -229,6 +230,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun getFirstReader(readers: ReaderCollection) {
 
+//        Toast.makeText(
+//            this,
+//            "Dumaan2.",
+//            Toast.LENGTH_LONG
+//        ).show()
+
         if (readers.isEmpty()) {
             displayReaderNotFound(
                 "Device Disconnected",
@@ -249,9 +256,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var applContext:Context;
+    private lateinit var applContext: Context;
 
     private fun getUsbDevice() {
+
+//        Toast.makeText(
+//            this,
+//            "Dumaan3.",
+//            Toast.LENGTH_LONG
+//        ).show()
+
         try {
             m_reader = Globals.getInstance().getReader(m_deviceName, applContext)
 
@@ -267,9 +281,11 @@ class MainActivity : AppCompatActivity() {
             if (DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(
                     applContext,
                     mPermissionIntent,
-                    m_deviceName))
-
-            { CheckDevice() }
+                    m_deviceName
+                )
+            ) {
+                CheckDevice()
+            }
         } catch (e1: UareUException) {
 
             //Triggered when onResume exit app but dont close
@@ -317,7 +333,14 @@ class MainActivity : AppCompatActivity() {
                 //setButtonsEnabled(true)
                 getReaders()
             }
-            .setNegativeButton("Close") { dialog, which -> finish() }
+            .setNegativeButton("Close") { dialog, which ->
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    finishAffinity()
+                } else {
+                    finish()
+                }
+            }
 
         alertDialog = alertDialogBuilder.create()
         alertDialog.show()
