@@ -13,12 +13,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.digitalpersona.uareu.Engine;
 import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.karl.fingerprintmodule.Globals;
+import com.karl.fingerprintmodule.Models.User;
 import com.karl.fingerprintmodule.R;
 import com.karl.fingerprintmodule.Result;
 import com.karl.fingerprintmodule.ViewModels.FmdViewModel;
@@ -29,12 +32,14 @@ import java.util.ArrayList;
 
 
 import android.util.Base64;
+import android.widget.Toast;
 
 
 public class RegisterActivity extends AppCompatActivity {
 
     private AppCompatActivity activity;
     private FmdViewModel viewModel;
+    private User user;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,17 +49,28 @@ public class RegisterActivity extends AppCompatActivity {
         activity = this;
         viewModel = ViewModelProviders.of(activity).get(FmdViewModel.class);
 
-        initViews();
-        initReader();
+        user = (User) getIntent().getSerializableExtra("user");
 
+        initViews();
+
+        initReader();
         runThread();
+
         setListeners();
         viewModel.retrieveFingerPrints();
+
+        tv_name.setText(user.getF_name() + " " + user.getL_name());
+        Glide.with(this)
+                .load(user.getImage_path())
+                .apply(RequestOptions
+                        .circleCropTransform())
+                .into(iv_avatar);
     }
 
     private ImageView iv_thumbprint;
+    private ImageView iv_avatar;
     private TextView tv_message;
-    private EditText et_name;
+    private TextView tv_name;
     private Button btn_register;
     //private Button btn_find;
     private TextView tv_debugger;
@@ -62,8 +78,9 @@ public class RegisterActivity extends AppCompatActivity {
     private void initViews() {
 
         iv_thumbprint = findViewById(R.id.iv_thumbprint);
+        iv_avatar = findViewById(R.id.iv_avatar);
         tv_message = findViewById(R.id.tv_message);
-        et_name = findViewById(R.id.et_name);
+        tv_name = findViewById(R.id.tv_name);
         btn_register = findViewById(R.id.btn_register);
         //btn_find = findViewById(R.id.btn_find);
         tv_debugger = findViewById(R.id.tv_debugger);
@@ -81,16 +98,27 @@ public class RegisterActivity extends AppCompatActivity {
         try {
             Context applContext = getApplicationContext();
 
+//            Toast.makeText(this,"1",Toast.LENGTH_LONG).show();
+
             m_deviceName = getIntent().getExtras().getString("device_name");
+
+//            Toast.makeText(this,"2",Toast.LENGTH_LONG).show();
+
             m_reader = Globals.getInstance().getReader(m_deviceName, applContext);
 
+//            Toast.makeText(this,"3",Toast.LENGTH_LONG).show();
+
             m_reader.Open(Reader.Priority.EXCLUSIVE);
+
+//            Toast.makeText(this,"1",Toast.LENGTH_LONG).show();
+
             m_DPI = Globals.GetFirstDPI(m_reader);
             m_engine = UareUGlobal.GetEngine();
 
         } catch (Exception e) {
 
-            onBackPressed();
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            //onBackPressed();
             return;
         }
     }
@@ -104,7 +132,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String name = et_name.getText().toString();
+                String name = user.getId();
 
                 if (currentFMD != null && !name.isEmpty()) {
 
@@ -125,7 +153,9 @@ public class RegisterActivity extends AppCompatActivity {
                                     cap_result.image.getViews()[0].getHeight(),
                                     cap_result.image.getImageResolution(),
                                     cap_result.image.getCbeffId()
-                            ));
+                            )
+                            , user
+                    );
 
 
                     resetRegistration();
@@ -146,7 +176,6 @@ public class RegisterActivity extends AppCompatActivity {
     String tv_debugger_text = "";
 
     private void resetRegistration() {
-        et_name.setText("");
         tv_message.setText("");
 
         StringBuilder list = new StringBuilder();
@@ -230,7 +259,6 @@ public class RegisterActivity extends AppCompatActivity {
                                     0,
                                     fid.getCbeffId(),
                                     Fmd.Format.ANSI_378_2004);
-
                         }
 
                         //Eind user
@@ -252,7 +280,7 @@ public class RegisterActivity extends AppCompatActivity {
 //                            fmdCheckList = createFMDArrayFromArrayList();
 //
 //                            results = m_engine.Identify(searchFMD, 0, fmdCheckList, 100000, 2);
-//
+//\
 //                            if (results.length != 0) {
 //
 //                                m_score = m_engine.Compare(fmdCheckList[results[0].fmd_index], 0, searchFMD, 0);
@@ -315,6 +343,27 @@ public class RegisterActivity extends AppCompatActivity {
         fmdList.toArray(innerList);
 
         return innerList;
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        try {
+            m_reset = true;
+            try {
+                m_reader.CancelCapture();
+            } catch (Exception e) {
+                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            }
+            m_reader.Close();
+        } catch (Exception e) {
+
+            Log.w("UareUSampleJava", "error during reader shutdown");
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+
+        } finally {
+            finish();
+        }
     }
 }
 

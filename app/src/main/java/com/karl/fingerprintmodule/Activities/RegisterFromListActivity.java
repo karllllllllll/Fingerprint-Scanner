@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 
 import com.karl.fingerprintmodule.Fragments.RegisterFromListFragment;
 import com.karl.fingerprintmodule.R;
+import com.karl.fingerprintmodule.RecyclerViewClickListener;
 
 public class RegisterFromListActivity extends AppCompatActivity {
 
@@ -24,11 +25,25 @@ public class RegisterFromListActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        fragmentTransaction.replace(R.id.fl_user_list, new RegisterFromListFragment());
-        fragmentTransaction.addToBackStack(null);
 
-        // Commit the transaction
-        fragmentTransaction.commit();
+        String m_deviceName = "";
 
+        try {
+            m_deviceName = getIntent().getExtras().getString("device_name");
+
+            Bundle b = new Bundle();
+            b.putString("device_name", m_deviceName);
+            RegisterFromListFragment fragment = new RegisterFromListFragment();
+            fragment.setArguments(b);
+
+            fragmentTransaction.replace(R.id.fl_user_list, fragment);
+            fragmentTransaction.addToBackStack(null);
+
+            // Commit the transaction
+            fragmentTransaction.commit();
+
+        } catch (Exception e) {
+
+        }
     }
 }

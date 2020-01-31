@@ -32,14 +32,31 @@
                 android:text="Register your fingerprint"
                 android:textSize="@dimen/h5" />
 
+
         <ImageView
-                android:id="@+id/iv_thumbprint"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:id="@+id/iv_avatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="20dp"
                 android:contentDescription="TODO"
                 android:scaleType="fitXY" />
+
+        <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Karl Vincent"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="Employee"
+                android:textSize="20sp" />
 
         <TextView
                 android:id="@+id/tv_message"
@@ -51,19 +68,14 @@
                 android:textColor="@color/black"
                 android:textSize="20sp" />
 
-
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Name:" />
-
-        <EditText
-                android:id="@+id/et_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="ie. Karl Vincent"
-                android:textSize="20sp" />
+        <ImageView
+                android:id="@+id/iv_thumbprint"
+                android:layout_width="252dp"
+                android:layout_height="324dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="20dp"
+                android:contentDescription="TODO"
+                android:scaleType="fitXY" />
 
 
         <TextView
@@ -78,6 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:visibility="gone"
                 app:autoSizeTextType="uniform" />
 
 

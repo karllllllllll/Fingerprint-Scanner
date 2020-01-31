@@ -7,19 +7,24 @@ import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.digitalpersona.uareu.Engine;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
+import com.karl.fingerprintmodule.Models.User;
 import com.karl.fingerprintmodule.Result;
+import com.karl.fingerprintmodule.Static;
 import com.karl.fingerprintmodule.fingerprint;
 import com.karl.fingerprintmodule.volleyQueue;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,9 +48,7 @@ public class FmdViewModel extends AndroidViewModel {
                 getRequestQueue();
     }
 
-    private String url = "http://192.168.137.1/Biometrix/api/fmds";
-
-    public void saveFingerprint(fingerprint fp) {
+    public void saveFingerprint(fingerprint fp, User user) {
 
         Map<String, String> params = new HashMap<>();
         params.put("userID", fp.getUserID());
@@ -54,10 +57,12 @@ public class FmdViewModel extends AndroidViewModel {
         params.put("height", String.valueOf(fp.getHeight()));
         params.put("resolution", String.valueOf(fp.getResolution()));
         params.put("cbeff_id", String.valueOf(fp.getCbeff_id()));
+        params.put("f_name", user.getF_name());
+        params.put("l_name", user.getL_name());
         JSONObject parameters = new JSONObject(params);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, parameters, new Response.Listener<JSONObject>() {
+                (Request.Method.POST, Static.URL_BIOMETRIX, parameters, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -73,14 +78,14 @@ public class FmdViewModel extends AndroidViewModel {
                     }
                 });
 
-
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
         queue.add(jsonObjectRequest);
     }
 
     public void retrieveFingerPrints() {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, Static.URL_BIOMETRIX, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -102,13 +107,11 @@ public class FmdViewModel extends AndroidViewModel {
     }
 
     private Fmd[] fmdChecklist;
+    //private String[] uidList;
     private String[] uidList;
     private MutableLiveData<Result> fmdListConversionResult = new MutableLiveData<>();
 
-    public MutableLiveData<Result> getfmdListConversionResult() {
-
-        return this.fmdListConversionResult;
-    }
+    public MutableLiveData<Result> getfmdListConversionResult() { return this.fmdListConversionResult; }
 
     private void createFMDList(JSONObject jo) {
 
@@ -116,6 +119,7 @@ public class FmdViewModel extends AndroidViewModel {
             JSONArray fingerPrintsArray = jo.getJSONArray("msg");
             Fmd[] innerFMDList = new Fmd[fingerPrintsArray.length()];
             String[] innerIDList = new String[fingerPrintsArray.length()];
+            //User[] innerIDList = new User[fingerPrintsArray.length()];
 
             if (fingerPrintsArray.length() > 0) {
 
@@ -136,6 +140,12 @@ public class FmdViewModel extends AndroidViewModel {
 
                     innerFMDList[i] = fmd;
                     innerIDList[i] = fingerPrintsObj.getString("userID");
+//                    innerIDList[i] = new User(
+//                            fingerPrintsObj.getString("userID"),
+//                            fingerPrintsObj.getString("f_name"),
+//                            fingerPrintsObj.getString("l_name"),
+//                            ""
+//                    ) ;
                 }
 
                 fmdChecklist = innerFMDList;
@@ -172,13 +182,19 @@ public class FmdViewModel extends AndroidViewModel {
                 m_score = m_engine.Compare(fmdChecklist[results[0].fmd_index], 0, searchFMD, 0);
 
                 String message = uidList[results[0].fmd_index];
-                if (m_score != -1) {
 
-                    DecimalFormat formatting = new DecimalFormat("##.######");
-                    result.setMessage(message + "\n (Dissimilarity Score: " + m_score + ", False match rate: " + Double.valueOf(formatting.format((double) m_score / 0x7FFFFFFF)) + ")");
-                } else {
-                    result.setMessage(message);
-                }
+                //String message = u.getF_name() + " " + u.getL_name();
+                //String message = u.getId();
+
+//                if (m_score != -1) {
+//
+//                    DecimalFormat formatting = new DecimalFormat("##.######");
+//                    result.setMessage(message + "\n (Dissimilarity Score: " + m_score + ", False match rate: " + Double.valueOf(formatting.format((double) m_score / 0x7FFFFFFF)) + ")");
+//                } else {
+//                    result.setMessage(message);
+//                }
+
+                result.setMessage(message);
             } else {
                 m_score = -1;
 
@@ -193,4 +209,22 @@ public class FmdViewModel extends AndroidViewModel {
 
         return result;
     }
+
+//    public class UserResult extends Result{
+//
+//        private int userPosition = null;
+//
+//        public UserResult(@NotNull String status, @NotNull String message) {
+//            super(status, message);
+//        }
+//
+//        public void setUserPosition(int i){
+//            this.userPosition = i;
+//        }
+//
+//        public int getUserPosition(){
+//            return this.userPosition;
+//        }
+//    }
 }
+
