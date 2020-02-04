@@ -6,4 +6,32 @@
     <color name="white">#FFF</color>
     <color name="blue">#000066</color>
     <color name="black">#000</color>
+
+
+    <color name="blue50">#E3F2FD</color>
+    <color name="blue100">#BBDEFB</color>
+    <color name="blue200">#90CAF9</color>
+    <color name="blue300">#64B5F6</color>
+    <color name="blue400">#42A5F5</color>
+    <color name="blue500">#2196F3</color>
+    <color name="blue600">#1E88E5</color>
+    <color name="blue700">#1976D2</color>
+    <color name="blue800">#1565C0</color>
+    <color name="blue900">#0D47A1</color>
+    <color name="A100">#82B1FF</color>
+    <color name="A200">#448AFF</color>
+    <color name="A400">#2979FF</color>
+    <color name="A700">#2962FF</color>
+
+
+
+    <color name="lightBlue">#97B2DE</color>
+    <color name="medBlue">#1A488E</color>
+    <color name="darkBlue">#092147</color>
+
+
+    <color name="success">#75e900</color>
+    <color name="error">#F44336</color>
+
+
 </resources>

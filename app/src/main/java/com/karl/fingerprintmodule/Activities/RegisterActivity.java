@@ -1,5 +1,6 @@
 package com.karl.fingerprintmodule.Activities;
 
+import android.arch.lifecycle.Observer;
 import android.support.v7.app.AppCompatActivity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -72,6 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView tv_message;
     private TextView tv_name;
     private Button btn_register;
+    private Button btn_delete;
     //private Button btn_find;
     private TextView tv_debugger;
 
@@ -82,6 +84,8 @@ public class RegisterActivity extends AppCompatActivity {
         tv_message = findViewById(R.id.tv_message);
         tv_name = findViewById(R.id.tv_name);
         btn_register = findViewById(R.id.btn_register);
+        btn_delete = findViewById(R.id.btn_delete);
+        btn_register.setEnabled(false);
         //btn_find = findViewById(R.id.btn_find);
         tv_debugger = findViewById(R.id.tv_debugger);
     }
@@ -97,21 +101,9 @@ public class RegisterActivity extends AppCompatActivity {
     private void initReader() {
         try {
             Context applContext = getApplicationContext();
-
-//            Toast.makeText(this,"1",Toast.LENGTH_LONG).show();
-
             m_deviceName = getIntent().getExtras().getString("device_name");
-
-//            Toast.makeText(this,"2",Toast.LENGTH_LONG).show();
-
             m_reader = Globals.getInstance().getReader(m_deviceName, applContext);
-
-//            Toast.makeText(this,"3",Toast.LENGTH_LONG).show();
-
             m_reader.Open(Reader.Priority.EXCLUSIVE);
-
-//            Toast.makeText(this,"1",Toast.LENGTH_LONG).show();
-
             m_DPI = Globals.GetFirstDPI(m_reader);
             m_engine = UareUGlobal.GetEngine();
 
@@ -139,24 +131,28 @@ public class RegisterActivity extends AppCompatActivity {
                     fmdArrayList.add(new employeeBiometrix(name, currentFMD));
                     fmdList.add(currentFMD);
 
-
                     // Convert byte[] to String for network transfer
                     String encoded = Base64.encodeToString(cap_result.image.getViews()[0].getImageData(), Base64.DEFAULT);
                     //Decodes converted string back
                     byte[] data = Base64.decode(encoded, Base64.DEFAULT);
 
-                    viewModel.saveFingerprint(
-                            new fingerprint(
-                                    name,
-                                    encoded,
-                                    cap_result.image.getViews()[0].getWidth(),
-                                    cap_result.image.getViews()[0].getHeight(),
-                                    cap_result.image.getImageResolution(),
-                                    cap_result.image.getCbeffId()
-                            )
-                            , user
-                    );
+                    if (userHasFingerprint) {
 
+                        viewModel.updateFingerprint(user.getId(), encoded);
+                    } else {
+
+                        viewModel.saveFingerprint(
+                                new fingerprint(
+                                        name,
+                                        encoded,
+                                        cap_result.image.getViews()[0].getWidth(),
+                                        cap_result.image.getViews()[0].getHeight(),
+                                        cap_result.image.getImageResolution(),
+                                        cap_result.image.getCbeffId()
+                                )
+                                , user
+                        );
+                    }
 
                     resetRegistration();
                 } else {
@@ -165,13 +161,34 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-//        btn_find.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                check = true;
-//            }
-//        });
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewModel.removeFingerprint(user.getId());
+            }
+        });
+
+        viewModel.getUserFingerprint(user.getId());
+        viewModel.getUserHasFingerint().
+
+                observe(this, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean aBoolean) {
+
+                        userHasFingerprint = aBoolean;
+                        btn_register.setEnabled(true);
+
+                        if (aBoolean) {
+                            btn_delete.setVisibility(View.VISIBLE);
+                            btn_register.setText("Change Fingerprint");
+                        } else {
+                            btn_register.setText("Register Fingerprint");
+                        }
+                    }
+                });
     }
+
+    private Boolean userHasFingerprint = false;
 
     String tv_debugger_text = "";
 
@@ -347,7 +364,9 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     @Override
-    public void onBackPressed() {
+    protected void onDestroy() {
+        super.onDestroy();
+
         try {
             m_reset = true;
             try {
@@ -360,9 +379,6 @@ public class RegisterActivity extends AppCompatActivity {
 
             Log.w("UareUSampleJava", "error during reader shutdown");
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-
-        } finally {
-            finish();
         }
     }
 }

@@ -11,7 +11,6 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.digitalpersona.uareu.Engine;
@@ -20,17 +19,16 @@ import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.karl.fingerprintmodule.Models.User;
 import com.karl.fingerprintmodule.Result;
+import com.karl.fingerprintmodule.Session;
+import com.karl.fingerprintmodule.SharedPref.SharedPreferenceManager;
 import com.karl.fingerprintmodule.Static;
 import com.karl.fingerprintmodule.fingerprint;
 import com.karl.fingerprintmodule.volleyQueue;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +48,8 @@ public class FmdViewModel extends AndroidViewModel {
 
     public void saveFingerprint(fingerprint fp, User user) {
 
+        final Session session = SharedPreferenceManager.getInstance(app.getBaseContext()).getSessions();
+
         Map<String, String> params = new HashMap<>();
         params.put("userID", fp.getUserID());
         params.put("data", fp.getData());
@@ -59,6 +59,11 @@ public class FmdViewModel extends AndroidViewModel {
         params.put("cbeff_id", String.valueOf(fp.getCbeff_id()));
         params.put("f_name", user.getF_name());
         params.put("l_name", user.getL_name());
+
+        params.put("location_id", session.getSelectedLocationID());
+        params.put("database", session.getD());
+        params.put("table", session.getT());
+        params.put("link", session.getLink());
         JSONObject parameters = new JSONObject(params);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -103,6 +108,7 @@ public class FmdViewModel extends AndroidViewModel {
                     }
                 });
 
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(60 * 1000, 1, Static.DEFAULT_BACKOFF_MULT));
         queue.add(jsonObjectRequest);
     }
 
@@ -111,7 +117,9 @@ public class FmdViewModel extends AndroidViewModel {
     private String[] uidList;
     private MutableLiveData<Result> fmdListConversionResult = new MutableLiveData<>();
 
-    public MutableLiveData<Result> getfmdListConversionResult() { return this.fmdListConversionResult; }
+    public MutableLiveData<Result> getfmdListConversionResult() {
+        return this.fmdListConversionResult;
+    }
 
     private void createFMDList(JSONObject jo) {
 
@@ -210,21 +218,100 @@ public class FmdViewModel extends AndroidViewModel {
         return result;
     }
 
-//    public class UserResult extends Result{
-//
-//        private int userPosition = null;
-//
-//        public UserResult(@NotNull String status, @NotNull String message) {
-//            super(status, message);
-//        }
-//
-//        public void setUserPosition(int i){
-//            this.userPosition = i;
-//        }
-//
-//        public int getUserPosition(){
-//            return this.userPosition;
-//        }
-//    }
+
+//    Might use old value
+    private MutableLiveData<Boolean> userHasFingerint = new MutableLiveData<>();
+    public MutableLiveData<Boolean> getUserHasFingerint() { return this.userHasFingerint; }
+    public void getUserFingerprint(String userID) {
+
+        String url = Static.URL_BIOMETRIX + "/" + userID;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            if (response.getString("status").equals(Static.API_STATUS_SUCCESS)) {
+                                userHasFingerint.setValue(true);
+                            } else {
+                                userHasFingerint.setValue(false);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            userHasFingerint.setValue(false);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        Toast.makeText(app.getBaseContext(), error.toString(), Toast.LENGTH_LONG).show();
+                        userHasFingerint.setValue(false);
+                    }
+                });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
+        queue.add(jsonObjectRequest);
+    }
+
+    public void removeFingerprint(final String userID) {
+
+        String url = Static.URL_BIOMETRIX + "/" + userID;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.DELETE, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        Toast.makeText(app.getBaseContext(), "Fingerprint Removed!", Toast.LENGTH_LONG).show();
+
+                        getUserFingerprint(userID);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        Toast.makeText(app.getBaseContext(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
+        queue.add(jsonObjectRequest);
+    }
+
+    public void updateFingerprint(String userID, final String data) {
+
+        String url = Static.URL_BIOMETRIX + "/update-fmd/" + userID;
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("data", data);
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, url, new JSONObject(params), new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        Toast.makeText(app.getBaseContext(), response.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        Toast.makeText(app.getBaseContext(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
+        queue.add(jsonObjectRequest);
+    }
 }
+
 

@@ -5,6 +5,9 @@ import android.app.Dialog
 import android.app.PendingIntent
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.arch.persistence.room.Database
+import android.arch.persistence.room.Room
+import android.arch.persistence.room.RoomDatabase
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -25,6 +28,7 @@ import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbException
 import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbHost
 import com.karl.fingerprintmodule.Globals
 import com.karl.fingerprintmodule.R
+import com.karl.fingerprintmodule.SharedPref.SharedPreferenceManager
 import com.karl.fingerprintmodule.Static
 import com.karl.fingerprintmodule.ViewModels.MainActivityViewModel
 

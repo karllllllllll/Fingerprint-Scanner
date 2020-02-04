@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.UareUGlobal;
+import com.karl.fingerprintmodule.Helper;
 import com.karl.fingerprintmodule.Models.User;
 import com.karl.fingerprintmodule.Static;
 import com.karl.fingerprintmodule.ViewModels.FmdViewModel;
@@ -50,13 +52,12 @@ public class TimeInActivity extends AppCompatActivity {
         initReader();
         setListeners();
 
-        viewModel.retrieveFingerPrints();
-        tkviewModel.loginApi("hprodriguez@iplusonline.com", "password123", "demo");
-        setBooleans(true, false, false, false);
-        UpdateGUI();
+        retrieveData();
     }
 
     private void init() {
+
+        helper = Helper.getInstance(this);
         viewModel = ViewModelProviders.of(this).get(FmdViewModel.class);
         tkviewModel = ViewModelProviders.of(this).get(TimekeepingViewModel.class);
     }
@@ -88,12 +89,14 @@ public class TimeInActivity extends AppCompatActivity {
     private int m_DPI = 0;
     private Engine m_engine = null;
     private Engine.Candidate[] results = null;
+    private String deviceName = "";
 
     private void initReader() {
         try {
             Context applContext = getApplicationContext();
 
-            m_deviceName = getIntent().getExtras().getString("device_name");
+            deviceName = getIntent().getExtras().getString("device_name");
+            m_deviceName = deviceName;
             m_reader = Globals.getInstance().getReader(m_deviceName, applContext);
 
             m_reader.Open(Reader.Priority.EXCLUSIVE);
@@ -107,17 +110,43 @@ public class TimeInActivity extends AppCompatActivity {
         }
     }
 
+    private Boolean hasFingerprints = false;
+    private Boolean hasUsers = false;
+
+    private void runThreadIfDataComplete() {
+
+        if (hasFingerprints && hasUsers) {
+            tv_debugger_text = "Place your thumb on top of the device";
+            setBooleans(false, false, false, false);
+            UpdateGUI();
+            runThread();
+        }
+    }
+
     private void setListeners() {
+
+        tkviewModel.getUserArrayList().observe(this, new Observer<ArrayList<User>>() {
+            @Override
+            public void onChanged(@Nullable ArrayList<User> users) {
+
+                if (users != null && users.size() > 0) {
+
+                    hasUsers = true;
+                    runThreadIfDataComplete();
+                } else {
+                    Toast.makeText(getApplicationContext(), "No Users To Search", Toast.LENGTH_LONG).show();
+                    showRetryDialog();
+                }
+            }
+        });
 
         viewModel.getfmdListConversionResult().observe(this, new Observer<Result>() {
             @Override
             public void onChanged(@Nullable Result result) {
                 if (result != null && result.getStatus().equals("success")) {
 
-                    tv_debugger_text = "Place your thumb on top of the device";
-                    setBooleans(false, false, false, false);
-                    UpdateGUI();
-                    runThread();
+                    hasFingerprints = true;
+                    tkviewModel.getUsers();
                 } else {
 
                     tv_debugger_text = "";
@@ -127,52 +156,107 @@ public class TimeInActivity extends AppCompatActivity {
             }
         });
 
-        tkviewModel.getClockResult().observe(this, new Observer<Result>() {
+        tkviewModel.getFindUserResult().observe(this, new Observer<Result>() {
             @Override
             public void onChanged(Result result) {
 
                 if (result.getStatus().equals(Static.API_STATUS_SUCCESS)) {
 
-                    showOwner();
+                    //showOwner();
                 } else {
+                    fingerPrintOwner = null;
                     Toast.makeText(getApplicationContext(), Static.API_STATUS_FAILED, Toast.LENGTH_LONG).show();
                 }
+
+                showOwner();
             }
         });
     }
 
+    private void retrieveData() {
+
+        viewModel.retrieveFingerPrints();
+        setBooleans(true, false, false, false);
+        UpdateGUI();
+    }
+
     private Dialog d;
+    private Helper helper;
 
     private void showOwner() {
 
+        if (d.isShowing()) {
+            d.dismiss();
+        }
+
+        d.setContentView(R.layout.dialog_fingerprint_owner_info);
+        ImageView iv_avatar = d.findViewById(R.id.iv_avatar);
+        TextView tv_fullname = d.findViewById(R.id.tv_fullname);
+        TextView tv_current_time = d.findViewById(R.id.tv_current_time);
+        TextView tv_time_in = d.findViewById(R.id.tv_time_in);
+        TextView tv_time_out = d.findViewById(R.id.tv_time_out);
+        Button btn_clock_in_out = d.findViewById(R.id.btn_clock_in_out);
+
+        final String time = helper.now();
+
         if (fingerPrintOwner != null) {
-
-            if (d.isShowing()) { d.dismiss(); }
-
-            d.setContentView(R.layout.dialog_fingerprint_owner_info);
-            ImageView iv_avatar = d.findViewById(R.id.iv_avatar);
-            TextView tv_fullname = d.findViewById(R.id.tv_fullname);
 
             try {
 
                 String fullName = fingerPrintOwner.getF_name() + " " + fingerPrintOwner.getL_name();
-                //String fullName = fingerPrintOwner.getImage_path();
 
+                tv_time_in.setText(helper.convertToReadableTime(fingerPrintOwner.getTime_in()));
+                tv_time_out.setText(helper.convertToReadableTime(fingerPrintOwner.getTime_out()));
+                tv_current_time.setText(helper.convertToReadableTime(time));
                 tv_fullname.setText(fullName);
+
                 Glide.with(this)
                         .load(fingerPrintOwner.getImage_path())
-                        .apply(RequestOptions
-                                .circleCropTransform())
+                        .apply(RequestOptions.circleCropTransform())
                         .into(iv_avatar);
 
+                String blankTime = "null";
+
+                if (!fingerPrintOwner.getTime_in().equals(blankTime) && !fingerPrintOwner.getTime_out().equals(blankTime)) {
+
+                    btn_clock_in_out.setEnabled(false);
+                    btn_clock_in_out.setText("You have already clocked out for the day!");
+                } else {
+
+                    btn_clock_in_out.setEnabled(true);
+
+                    if (fingerPrintOwner.getTime_in().equals(blankTime)) {
+                        btn_clock_in_out.setText("Clock in");
+                    } else {
+                        btn_clock_in_out.setText("Clock out");
+                    }
+
+                    btn_clock_in_out.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            tkviewModel.sendClockInOut(fingerPrintOwner);
+                        }
+                    });
+                }
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             }
 
-            d.show();
-        }
-    }
+        } else {
 
+            Toast.makeText(getApplicationContext(), "Inangyan!", Toast.LENGTH_LONG).show();
+
+
+            tv_time_in.setText("");
+            tv_time_out.setText("");
+            tv_current_time.setText(helper.convertToReadableTime(time));
+            tv_fullname.setText("User not found");
+            btn_clock_in_out.setEnabled(false);
+            btn_clock_in_out.setText("Cannot clock in");
+        }
+
+        d.show();
+    }
 
     private void showRetryDialog() {
 
@@ -180,10 +264,10 @@ public class TimeInActivity extends AppCompatActivity {
         alertDialogBuilder.setTitle("Oops")
                 .setMessage("Something went wrong!\nRetry?")
                 .setCancelable(false)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        viewModel.retrieveFingerPrints();
+                        retrieveData();
                     }
                 })
                 .setNegativeButton("Close", new DialogInterface.OnClickListener() {
@@ -277,7 +361,6 @@ public class TimeInActivity extends AppCompatActivity {
                         if (r.getStatus().equals("success")) {
 
                             setBooleans(false, false, true, false);
-
                             fingerPrintOwner = tkviewModel.findUserByUserID(r.getMessage());
                         } else {
                             setBooleans(false, false, false, true);
@@ -302,12 +385,24 @@ public class TimeInActivity extends AppCompatActivity {
         }).start();
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        m_reset = true;
+        try {
+            m_reset = true;
+            try {
+                m_reader.CancelCapture();
+            } catch (Exception e) {
+                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            }
+            m_reader.Close();
+        } catch (Exception e) {
+
+            Log.w("UareUSampleJava", "error during reader shutdown");
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+        }
     }
+
 }
 

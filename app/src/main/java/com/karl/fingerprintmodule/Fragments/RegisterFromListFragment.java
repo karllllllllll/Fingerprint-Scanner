@@ -59,7 +59,11 @@ public class RegisterFromListFragment extends Fragment implements RecyclerViewCl
         final RecyclerViewClickListener listener = this;
 
         //viewModel.loginApi("makati@zol.com", "tk123456", "zolvere");
-        viewModel.loginApi("hprodriguez@iplusonline.com", "password123", "demo");
+        //viewModel.loginApi("hprodriguez@iplusonline.com", "password123", "demo");
+        //viewModel.loginApi("kmmirafuente@iplusonline.com", "karl1997", "zolvere");
+        viewModel.getUsers();
+
+
         viewModel.getUserArrayList().observe(this, new Observer<ArrayList<User>>() {
             @Override
             public void onChanged(@Nullable ArrayList<User> users) {
@@ -94,9 +98,6 @@ public class RegisterFromListFragment extends Fragment implements RecyclerViewCl
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-
-
 
     }
 }

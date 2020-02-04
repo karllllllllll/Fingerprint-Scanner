@@ -2,23 +2,21 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="@dimen/card_elevation"
-        app:cardMaxElevation="@dimen/card_elevation">
+        android:layout_height="wrap_content">
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="#272727"
             android:orientation="vertical">
 
         <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/blue"
                 android:padding="@dimen/margin_xxl">
 
             <LinearLayout
+                    android:gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
@@ -28,14 +26,23 @@
                         android:layout_gravity="end"
                         android:src="@drawable/enter_64px" />
 
-                <TextView
+                <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin_sm"
-                        android:layout_marginLeft="@dimen/margin_sm"
-                        android:text="Clock in?"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/h3P5" />
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_sm"
+                            android:layout_marginLeft="@dimen/margin_sm"
+                            android:text="Clock in?"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/h3P5" />
+
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </FrameLayout>
@@ -46,37 +53,59 @@
                 android:padding="@dimen/margin_xl"
                 android:stretchColumns="1">
 
-            <TableRow android:layout_marginBottom="@dimen/margin_xxl">
+            <TableRow android:gravity="center">
 
-                <ImageView
-                        android:id="@+id/iv_avatar"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp" />
 
                 <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start"
+                        android:layout_gravity="center"
                         android:layout_marginStart="@dimen/margin_sm"
                         android:layout_marginLeft="@dimen/margin_sm"
+                        android:gravity="center"
                         android:orientation="vertical">
 
+                    <ImageView
+                            android:id="@+id/iv_avatar"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp" />
 
                     <TextView
                             android:id="@+id/tv_fullname"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Karl Vincent Mirafuente"
-                            android:textColor="@color/black"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/h4"
                             android:textStyle="bold" />
 
-                    <TextView
+                    <TableLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="@dimen/margin_xxl"
-                            android:text="Employee"
-                            android:textSize="@dimen/h5" />
+                            android:layout_height="wrap_content">
+
+
+                        <TableRow>
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Current time:"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/h5" />
+
+                            <TextView
+                                    android:id="@+id/tv_current_time"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_sm"
+                                    android:layout_marginLeft="@dimen/margin_sm"
+                                    android:gravity="end"
+                                    android:text="10:00 AM"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/h4"
+                                    android:textStyle="bold" />
+                        </TableRow>
+                    </TableLayout>
 
                 </LinearLayout>
             </TableRow>
@@ -85,7 +114,7 @@
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end">
+                android:gravity="center">
 
             <TableLayout
                     android:layout_width="wrap_content"
@@ -99,6 +128,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Time in:"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/h5" />
 
                     <TextView
@@ -109,8 +139,9 @@
                             android:layout_marginLeft="@dimen/margin_sm"
                             android:gravity="end"
                             android:text="08:00 AM"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/h5" />
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/h5"
+                            android:textStyle="bold" />
                 </TableRow>
 
                 <TableRow>
@@ -119,6 +150,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Time out:"
+                            android:textColor="@color/white"
                             android:textSize="@dimen/h5" />
 
                     <TextView
@@ -129,18 +161,28 @@
                             android:layout_marginLeft="@dimen/margin_sm"
                             android:gravity="end"
                             android:text="05:00 PM"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/h5" />
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/h5"
+                            android:textStyle="bold" />
+                </TableRow>
+
+                <TableRow>
+
                 </TableRow>
             </TableLayout>
         </RelativeLayout>
 
         <Button
+                android:id="@+id/btn_clock_in_out"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_xxl"
+                android:layout_marginLeft="@dimen/margin_xxl"
+                android:layout_marginTop="@dimen/margin_sm"
+                android:layout_marginRight="@dimen/margin_xxl"
+                android:layout_marginBottom="@dimen/margin_xxl"
                 android:text="Clock in"
                 android:textColor="@color/white"
-                app:backgroundTint="@color/blue" />
+                app:backgroundTint="#1DB954" />
+
     </LinearLayout>
 </android.support.v7.widget.CardView>
