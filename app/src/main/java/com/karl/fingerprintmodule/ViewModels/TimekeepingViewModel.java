@@ -20,6 +20,7 @@ import com.karl.fingerprintmodule.Result;
 import com.karl.fingerprintmodule.Session;
 import com.karl.fingerprintmodule.SharedPref.SharedPreferenceManager;
 import com.karl.fingerprintmodule.Static;
+import com.karl.fingerprintmodule.PendingItem;
 import com.karl.fingerprintmodule.UserEDTR;
 import com.karl.fingerprintmodule.volleyQueue;
 
@@ -33,16 +34,14 @@ import java.util.Map;
 
 public class TimekeepingViewModel extends AndroidViewModel {
 
+    //Main data
+    private MutableLiveData<ArrayList<User>> userArrayList = new MutableLiveData<>();
 
-    //PRE REPLACE MO LAHAT STATIC ZOLVERE
     private Application app;
     private RequestQueue queue;
     private Helper helper;
     private SharedPreferenceManager sharedPreferenceManager;
     private Session session;
-
-    private MutableLiveData<ArrayList<User>> userArrayList = new MutableLiveData<>();
-
 
     public TimekeepingViewModel(@NonNull Application application) {
         super(application);
@@ -209,11 +208,10 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
         try {
 
+            //Users retrieved
             if (response.has("status") && response.getString("status").equals("success")) {
 
-
                 JSONArray jsonArray = response.getJSONArray("msg");
-
 
                 for (int i = 0; i < jsonArray.length(); i++) {
 
@@ -235,7 +233,7 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
 
                         //EDTR
-                        String default_value = "null";
+                        String default_value = Static.JSON_BLANK_VALUE;
 
                         String edtr_time_in = default_value;
                         String edtr_time_out = default_value;
@@ -256,6 +254,7 @@ public class TimekeepingViewModel extends AndroidViewModel {
                             }
                         }
 
+
                         innerList.add(new User(
                                 id,
                                 f_name,
@@ -273,10 +272,13 @@ public class TimekeepingViewModel extends AndroidViewModel {
                         Toast.makeText(app.getBaseContext(), "User Parse Error!", Toast.LENGTH_LONG).show();
                     }
                 }
+
+                //Message Failed
             } else {
                 Toast.makeText(app.getBaseContext(), response.toString(), Toast.LENGTH_LONG).show();
                 innerList = null;
             }
+            //Parse Error
         } catch (Exception e) {
 
             String msg = e.toString();
@@ -289,12 +291,14 @@ public class TimekeepingViewModel extends AndroidViewModel {
                 msg = ex.toString();
             }
 
-            Toast.makeText(app.getBaseContext(), msg, Toast.LENGTH_LONG).show();
+            //Toast.makeText(app.getBaseContext(), e.toString() + msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(app.getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
             innerList = null;
         }
 
         Toast.makeText(app.getBaseContext(), "User List Ready!", Toast.LENGTH_LONG).show();
         userArrayList.setValue(innerList);
+        removePendingItems();
     }
 
     public User findUserFromPosition(int i) {
@@ -337,6 +341,7 @@ public class TimekeepingViewModel extends AndroidViewModel {
         return user;
     }
 
+
     public void sendClockInOut(final User owner) {
 
         final String time = helper.now();
@@ -363,7 +368,7 @@ public class TimekeepingViewModel extends AndroidViewModel {
                     @Override
                     public void onResponse(JSONObject response) {
 
-                        clockInResult(response);
+                        timeInOutResponseResult(response);
                     }
                 }, new Response.ErrorListener() {
 
@@ -371,9 +376,11 @@ public class TimekeepingViewModel extends AndroidViewModel {
                     public void onErrorResponse(VolleyError error) {
                         // TODO: Handle error
 
-                        addPendingUpdate(new UserEDTR(owner.getId(), time, Static.reference, owner.getPin(), date, ""));
-                        clockResult.setValue(new Result(Static.API_STATUS_FAILED, "Your time in was saved"));
-
+                        if (addPendingUpdate(new PendingItem(owner.getId(), time, Static.reference, owner.getPin(), date, ""))) {
+                            timeInOutResult.setValue(new Result(Static.API_STATUS_FAILED, "Your time in was saved"));
+                        } else {
+                            timeInOutResult.setValue(new Result(Static.API_STATUS_FAILED, "Your time in was not saved!"));
+                        }
                     }
                 }) {
             @Override
@@ -388,17 +395,14 @@ public class TimekeepingViewModel extends AndroidViewModel {
         };
 
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
+
+        // For Debug
+        //jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
         queue.add(jsonObjectRequest);
     }
 
 
-    private MutableLiveData<Result> clockResult = new MutableLiveData<>();
-
-    public MutableLiveData<Result> getClockResult() {
-        return this.clockResult;
-    }
-
-    private void clockInResult(JSONObject jsonObj) {
+    private void timeInOutResponseResult(JSONObject jsonObj) {
 
         try {
 
@@ -407,16 +411,77 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
             if (status.equals(Static.API_STATUS_SUCCESS)) {
 
-                clockResult.setValue(new Result(Static.API_STATUS_SUCCESS, "Time in saved!"));
+                timeInOutResult.setValue(new Result(Static.API_STATUS_SUCCESS, "Time in saved!"));
             } else {
-                clockResult.setValue(new Result(Static.API_STATUS_FAILED, msg));
+
+                if (msg.equals("Access Denied: invalid token!")) {
+
+                    timeInOutResult.setValue(new Result(Static.API_STATUS_FAILED, "Access Denied: invalid token!"));
+                } else {
+
+                    timeInOutResult.setValue(new Result(Static.API_STATUS_FAILED, msg));
+                }
             }
         } catch (Exception e) {
-            clockResult.setValue(new Result(Static.API_STATUS_FAILED, "Oops! Something went wrong"));
+            timeInOutResult.setValue(new Result(Static.API_STATUS_FAILED, "Oops! Something went wrong"));
         }
     }
 
-    private void addPendingUpdate(UserEDTR edtr) {
+    private MutableLiveData<Result> timeInOutResult = new MutableLiveData<>();
+
+    public MutableLiveData<Result> getTimeInOutResult() {
+        return this.timeInOutResult;
+    }
+
+
+    //PENDING UPDATES
+
+    // Removes pending items when user employee has same time
+    // Triggered when sending items
+
+    // Called on line 301
+    private void removePendingItems() {
+
+        //val pending_list = JSONArray(session.toBeChecked())
+        ArrayList<PendingItem> pending_updates_array = pendingUpdatesAsArray();
+
+        //If checkList not empty
+        //if (pending_list.length() > 0 && pending_updates_array.length() > 0) {
+        if (pending_updates_array.size() > 0) {
+
+            //Loops to be checked
+            for (PendingItem pendingItem : pending_updates_array) {
+
+                String to_be_checked_time = pendingItem.getTime();
+                String to_be_checked_date = pendingItem.getDate();
+                String user_id = pendingItem.getUser_id();
+
+                //Retrieves user's time in,time out and date
+                UserEDTR user_edtr = getUserEDTR(user_id);
+
+                //If user already has same time in or out with to be checked time
+
+                if (user_edtr != null) {
+
+                    if (to_be_checked_date.equals(user_edtr.getDate_in())) {
+
+                        if (to_be_checked_time.equals(user_edtr.getTime_in())
+                                || to_be_checked_time.equals(user_edtr.getTime_out())
+                                && !to_be_checked_time.equals("null")) {
+
+                            //finds the Pending Update and removes it
+                            findAndRemovePendingUpdate(pendingItem);
+                        }
+                    }
+                }
+            }
+
+            sendIfThereArePendingUpdates();
+        }
+    }
+
+    // OK
+    private Boolean addPendingUpdate(PendingItem edtr) {
 
         try {
             JSONArray pendingUpdates = new JSONArray(sharedPreferenceManager.getPendingUpdates());
@@ -433,21 +498,191 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
             sharedPreferenceManager.setPendingUpdates(pendingUpdates.toString());
 
-//            if (pendingUpdates.length() > 0) {
-//
-//                for (int i = 0; i < pendingUpdates.length(); i++) {
-//
-//                    JSONObject jo = pendingUpdates.getJSONObject(i);
-//
-//                    HashMap pendingUpdateHashMap = new Gson().fromJson(jo.toString(), HashMap.class);
-//                    pendingUpdateHashMap.put("")
-//                }
-//            }
+            return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    // Pending
+    public ArrayList<PendingItem> pendingUpdatesAsArray() {
+
+        ArrayList<PendingItem> innerList = new ArrayList<>();
+
+        try {
+            JSONArray pendingUpdates = new JSONArray(sharedPreferenceManager.getPendingUpdates());
+
+            if (pendingUpdates.length() > 0) {
+
+                for (int i = 0; i < pendingUpdates.length(); i++) {
+
+                    JSONObject pending_item = pendingUpdates.getJSONObject(i);
+
+                    String user_id = pending_item.getString("user_id");
+                    String time = pending_item.getString("time");
+                    String reference = pending_item.getString("reference");
+                    String pin = pending_item.getString("pin");
+                    String date = pending_item.getString("date");
+                    String location_id = pending_item.getString("location_id");
+
+                    innerList.add(new PendingItem(user_id, time, reference, pin, date, location_id));
+                }
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        return innerList;
     }
 
+    // Okay
+    private JSONArray getPendingUpdatesAsArray() {
+
+        JSONArray pendingUpdates = null;
+
+        try {
+            pendingUpdates = new JSONArray(sharedPreferenceManager.getPendingUpdates());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return pendingUpdates;
+    }
+
+    // Not checked
+    private UserEDTR getUserEDTR(String ID) {
+
+        ArrayList<User> users = getUserArrayList().getValue();
+        UserEDTR user_edtr = null;
+
+        if (users != null) {
+            for (User user : users) {
+
+                if (user.getId().equals(ID)) {
+
+                    user_edtr = new UserEDTR(user.getDate(), user.getTime_in(), user.getTime_out());
+                    break;
+                }
+            }
+        }
+        return user_edtr;
+    }
+
+    // Not checked
+    private void findAndRemovePendingUpdate(PendingItem pending_item_find) {
+        ArrayList<PendingItem> pending_updates_array = pendingUpdatesAsArray();
+
+        String user_id = pending_item_find.getUser_id();
+        String time = pending_item_find.getTime();
+        String date = pending_item_find.getDate();
+
+        if (pending_updates_array.size() > 0) {
+            //Loops to be checked
+            int index = 0;
+            for (PendingItem pendingItem : pending_updates_array) {
+
+                //To be checked
+                String pending_update_user_ID = pendingItem.getUser_id();
+                String pending_update_time = pendingItem.getTime();
+                String pending_update_date = pendingItem.getDate();
+
+                //Checks to be checked's
+                //User ID,
+                //time,
+                //date
+                if (user_id.equals(pending_update_user_ID) &&
+                        time.equals(pending_update_time) &&
+                        date.equals(pending_update_date)) {
+
+                    pending_updates_array.remove(index);
+                    break;
+                }
+
+                index++;
+            }
+
+
+            if (pending_updates_array.size() > 0) {
+
+                sharedPreferenceManager.clearPendingUpdates();
+
+                for (PendingItem pi : pending_updates_array) {
+                    addPendingUpdate(pi);
+                }
+            }
+        }
+    }
+
+    // Not checked
+    private void sendIfThereArePendingUpdates() {
+
+        //Toast.makeText(app.getBaseContext(), "Send Updates!" + pendingUpdatesAsArray().size(), Toast.LENGTH_LONG).show();
+
+
+        final HashMap<String, String> headers = new HashMap<>();
+        headers.put("d", session.getD());
+        headers.put("t", session.getT());
+        headers.put("token", session.getToken());
+
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Static.URL_PENDING_UPDATES, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+
+                try {
+                    if (response.getString("status").equals(Static.API_STATUS_SUCCESS)) {
+
+                        Toast.makeText(app.getBaseContext(), "Updates Sent!\n" + response.getString("user_id"), Toast.LENGTH_LONG).show();
+                        sharedPreferenceManager.clearPendingUpdates();
+                    } else {
+                        Toast.makeText(app.getBaseContext(), "Updates Not Sent!\n" + response.getString("errors"), Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(app.getBaseContext(), "Updates Not Sent!\n" + e.toString(), Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(app.getBaseContext(), "Error!\nDetails: " + error.toString(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            @Override
+            public byte[] getBody() {
+
+                try {
+                    JSONObject body_object = new JSONObject();
+                    body_object.put("queue", getPendingUpdatesAsArray());
+                    body_object.put("api_token", session.getApi_token());
+                    body_object.put("link", session.getLink());
+
+                    return body_object.toString().getBytes();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return headers;
+            }
+        };
+
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
+        queue.add(jsonObjectRequest);
+    }
 }

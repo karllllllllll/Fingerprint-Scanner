@@ -67,9 +67,12 @@
 
                 </android.support.v7.widget.CardView>
             </TableRow>
-
-
         </TableLayout>
+
+        <TextView
+                android:id="@+id/tv_updates"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
     </LinearLayout>
 </ScrollView>

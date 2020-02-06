@@ -171,6 +171,19 @@ public class TimeInActivity extends AppCompatActivity {
                 showOwner();
             }
         });
+
+        tkviewModel.getTimeInOutResult().observe(this, new Observer<Result>() {
+            @Override
+            public void onChanged(@Nullable Result result) {
+
+                if (result.getStatus().equals(Static.API_STATUS_SUCCESS)) {
+
+                    Toast.makeText(getApplicationContext(), "Time in successful!", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void retrieveData() {
@@ -245,7 +258,6 @@ public class TimeInActivity extends AppCompatActivity {
         } else {
 
             Toast.makeText(getApplicationContext(), "Inangyan!", Toast.LENGTH_LONG).show();
-
 
             tv_time_in.setText("");
             tv_time_out.setText("");
@@ -340,6 +352,7 @@ public class TimeInActivity extends AppCompatActivity {
             public void run() {
                 m_reset = false;
                 while (!m_reset) {
+
                     try {
                         cap_result = m_reader.Capture(Fid.Format.ANSI_381_2004, Globals.DefaultImageProcessing, m_DPI, -1);
                     } catch (Exception e) {

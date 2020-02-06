@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_lg"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0.0px"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardPreventCornerOverlap="false"
+                app:elevation="@dimen/card_elevation">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin_sm"
+                    android:orientation="vertical">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/margin_sm"
+                        android:orientation="vertical">
+
+                    <ImageView
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="@dimen/margin_xxl"
+                            android:layout_marginBottom="@dimen/margin_xxl"
+                            android:contentDescription="@string/todo" />
+
+
+                    <TableLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal">
+
+                        <TableRow>
+
+                            <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/time_in"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h5" />
+
+                            <TextView
+                                    android:id="@+id/tv_time_in"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_sm"
+                                    android:layout_marginLeft="@dimen/margin_sm"
+                                    android:text="@string/sample_time_am"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h5"
+                                    android:textStyle="bold" />
+                        </TableRow>
+
+                        <TableRow>
+
+                            <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/time_out"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h5" />
+
+                            <TextView
+                                    android:id="@+id/tv_time_out"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/margin_sm"
+                                    android:layout_marginLeft="@dimen/margin_sm"
+                                    android:text="@string/sample_time_out"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h5"
+                                    android:textStyle="bold" />
+                        </TableRow>
+                    </TableLayout>
+                </LinearLayout>
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin_sm"
+                        android:gravity="center"
+                        android:text="@string/please_enter_your_pin"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/h5"
+                        android:textStyle="bold" />
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:orientation="horizontal">
+
+                    <ImageView
+                            android:id="@+id/pin_1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_sm"
+                            android:contentDescription="@string/todo"
+                            android:src="@drawable/pin_indicator_default" />
+
+                    <ImageView
+                            android:id="@+id/pin_2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_sm"
+                            android:contentDescription="@string/todo"
+                            android:src="@drawable/pin_indicator_default" />
+
+                    <ImageView
+                            android:id="@+id/pin_3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_sm"
+                            android:contentDescription="@string/todo"
+                            android:src="@drawable/pin_indicator_default" />
+
+                    <ImageView
+                            android:id="@+id/pin_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_sm"
+                            android:contentDescription="@string/todo"
+                            android:src="@drawable/pin_indicator_default" />
+                </LinearLayout>
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
+
+                    <TableLayout
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:stretchColumns="*">
+
+                        <TableRow>
+
+                            <Button
+                                    android:id="@+id/numpad_1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/_1"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                            <Button
+                                    android:id="@+id/numpad_2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_2"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                            <Button
+                                    android:id="@+id/numpad_3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_3"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+                        </TableRow>
+
+                        <TableRow>
+
+                            <Button
+                                    android:id="@+id/numpad_4"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_4"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                            <Button
+                                    android:id="@+id/numpad_5"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_5"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                            <Button
+                                    android:id="@+id/numpad_6"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_6"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+                        </TableRow>
+
+                        <TableRow>
+
+                            <Button
+                                    android:id="@+id/numpad_7"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_7"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                            <Button
+                                    android:id="@+id/numpad_8"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_8"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                            <Button
+                                    android:id="@+id/numpad_9"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/todo"
+                                    android:gravity="center"
+                                    android:text="@string/_9"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                        </TableRow>
+
+                        <TableRow>
+
+                            <LinearLayout
+                                    android:id="@+id/numpad_clear"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center">
+
+                                <ImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="@drawable/ic_close_red_32dp"
+                                        android:contentDescription="@string/todo"
+                                        android:scaleType="fitCenter" />
+                            </LinearLayout>
+
+                            <Button
+                                    android:id="@+id/numpad_0"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/_0"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/h3P5" />
+
+                            <LinearLayout
+                                    android:id="@+id/numpad_send"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center">
+
+                                <ImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="@drawable/ic_check_circle_green_64dp"
+                                        android:contentDescription="@string/todo"
+                                        android:scaleType="fitCenter" />
+                            </LinearLayout>
+
+                        </TableRow>
+                    </TableLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>

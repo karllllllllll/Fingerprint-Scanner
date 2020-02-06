@@ -109,4 +109,12 @@ public class SharedPreferenceManager {
         editor.putString(KEY_PENDING_UPDATES, pendingUpdates);
         editor.apply();
     }
+
+    public void clearPendingUpdates() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(KEY_PENDING_UPDATES, "[]");
+        editor.apply();
+    }
 }

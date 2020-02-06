@@ -13,4 +13,20 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="back">Back</string>
     <string name="select">Select</string>
+    <string name="todo">TODO</string>
+    <string name="time_in">Time in:</string>
+    <string name="sample_time_am">08:00 AM</string>
+    <string name="time_out">Time out:</string>
+    <string name="sample_time_out">05:00 PM</string>
+    <string name="please_enter_your_pin">Please enter your PIN</string>
+    <string name="_0">0</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_3">3</string>
+    <string name="_4">4</string>
+    <string name="_5">5</string>
+    <string name="_6">6</string>
+    <string name="_7">7</string>
+    <string name="_8">8</string>
+    <string name="_9">9</string>
 </resources>

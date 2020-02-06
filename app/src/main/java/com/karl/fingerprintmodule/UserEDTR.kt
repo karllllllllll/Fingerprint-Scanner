@@ -1,10 +1,8 @@
 package com.karl.fingerprintmodule
+import java.io.Serializable
 
 data class UserEDTR(
-    var user_id: String,
-    var time: String,
-    var reference: String,
-    var pin: String,
-    var date: String,
-    var location_id: String
-)
+    var date_in: String,
+    var time_in: String,
+    var time_out: String
+) : Serializable

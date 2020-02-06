@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--android:exitFadeDuration="@android:integer/config_mediumAnimTime"-->
+
+    <item android:state_selected="true">
+        <shape android:shape="oval">
+            <solid android:color="#3b91d7" />
+            <stroke android:width="2dp" android:color="#3b91d7" />
+            <!-- Set the same value for both width and height to get a circular shape -->
+            <size android:width="25dp" android:height="25dp" />
+        </shape>
+    </item>
+
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/colorWhiteSmoke" />
+            <stroke android:width="2dp" android:color="#3b91d7" />
+            <!-- Set the same value for both width and height to get a circular shape -->
+            <size android:width="25dp" android:height="25dp" />
+        </shape>
+    </item>
+
+</selector>

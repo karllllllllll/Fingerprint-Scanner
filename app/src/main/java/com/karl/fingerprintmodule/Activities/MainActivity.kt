@@ -31,6 +31,7 @@ import com.karl.fingerprintmodule.R
 import com.karl.fingerprintmodule.SharedPref.SharedPreferenceManager
 import com.karl.fingerprintmodule.Static
 import com.karl.fingerprintmodule.ViewModels.MainActivityViewModel
+import com.karl.fingerprintmodule.ViewModels.TimekeepingViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,20 +50,33 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-//        if (m_deviceName.isEmpty()) {
-//            getReaders()
-//        } else {
-//            getUsbDevice()
-//        }
+        getPendingUpdates()
+    }
+
+    private fun getPendingUpdates() {
+
+        //tkviewModel.getUsers()
+        val tv_updates: TextView = findViewById(R.id.tv_updates)
+
+        val pu = tkviewModel.pendingUpdatesAsArray()
+
+        var StringPU = "";
+        for (pi in pu) {
+            StringPU = StringPU.plus(pi.user_id + " " + pi.time ).plus("\n")
+        }
+
+        tv_updates.setText(StringPU)
     }
 
     private lateinit var viewModel: MainActivityViewModel;
+    private lateinit var tkviewModel: TimekeepingViewModel;
 
     private fun init() {
 
         applContext = applicationContext
 
         viewModel = ViewModelProviders.of(this)[MainActivityViewModel::class.java]
+        tkviewModel = ViewModelProviders.of(this)[TimekeepingViewModel::class.java]
         ACTION_USB_PERMISSION =
             Static.ACTION_USB_PERMISSION
     }

@@ -1,14 +1,7 @@
 package com.karl.fingerprintmodule.Models
 
+import com.karl.fingerprintmodule.UserEDTR
 import java.io.Serializable
-
-//data class User(
-//    var id: String,
-//    var f_name: String,
-//    var l_name: String,
-//    var image_path: String
-//)
-//    : Serializable
 
 data class User(
     var id: String,
