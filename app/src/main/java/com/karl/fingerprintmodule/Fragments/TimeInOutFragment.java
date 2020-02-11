@@ -1,16 +1,19 @@
-package com.karl.fingerprintmodule.Activities;
+package com.karl.fingerprintmodule.Fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -24,42 +27,55 @@ import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.UareUGlobal;
+import com.karl.fingerprintmodule.Adapters.UsersAdapter;
+import com.karl.fingerprintmodule.Globals;
 import com.karl.fingerprintmodule.Helper;
 import com.karl.fingerprintmodule.Models.User;
-import com.karl.fingerprintmodule.Static;
-import com.karl.fingerprintmodule.ViewModels.FmdViewModel;
-import com.karl.fingerprintmodule.Globals;
 import com.karl.fingerprintmodule.R;
 import com.karl.fingerprintmodule.Result;
+import com.karl.fingerprintmodule.Static;
+import com.karl.fingerprintmodule.ViewModels.FmdViewModel;
 import com.karl.fingerprintmodule.ViewModels.TimekeepingViewModel;
 import com.skyfishjy.library.RippleBackground;
 
 import java.util.ArrayList;
 
+public class TimeInOutFragment extends Fragment {
 
-public class TimeInActivity extends AppCompatActivity {
+    private Context applContext;
+    private Activity Act;
 
     private FmdViewModel viewModel;
     private TimekeepingViewModel tkviewModel;
 
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_time_in);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+
+        View v = inflater.inflate(R.layout.activity_time_in, container, false);
+        //applContext = this.getContext();
+
+        applContext = getActivity().getApplicationContext();
+        Act = getActivity();
+        m_deviceName = getArguments().getString("device_name");
 
         init();
-        initViews();
-        //initReader();
-        //setListeners();
+        initViews(v);
+        initReader();
+        setListeners();
 
-        //retrieveData();
+        retrieveData();
+
+        return v;
     }
 
     private void init() {
 
-        helper = Helper.getInstance(this);
-        viewModel = ViewModelProviders.of(this).get(FmdViewModel.class);
-        tkviewModel = ViewModelProviders.of(this).get(TimekeepingViewModel.class);
+        helper = Helper.getInstance(applContext);
+        viewModel = ViewModelProviders.of(getActivity()).get(FmdViewModel.class);
+        tkviewModel = ViewModelProviders.of(getActivity()).get(TimekeepingViewModel.class);
     }
 
     private ProgressBar pb_loading;
@@ -69,18 +85,18 @@ public class TimeInActivity extends AppCompatActivity {
     private TextView tv_message;
     private RippleBackground rb_animation;
 
-    private void initViews() {
+    private void initViews(View v) {
 
-        pb_loading = findViewById(R.id.pb_loading);
-        tv_message = findViewById(R.id.tv_message);
-        iv_success = findViewById(R.id.iv_success);
-        iv_failed = findViewById(R.id.iv_failed);
-        iv_fingerprint = findViewById(R.id.iv_fingerprint);
+        pb_loading = v.findViewById(R.id.pb_loading);
+        tv_message = v.findViewById(R.id.tv_message);
+        iv_success = v.findViewById(R.id.iv_success);
+        iv_failed = v.findViewById(R.id.iv_failed);
+        iv_fingerprint = v.findViewById(R.id.iv_fingerprint);
 
-        rb_animation = findViewById(R.id.rb_animation);
+        rb_animation = v.findViewById(R.id.rb_animation);
 
-        d = new Dialog(this, R.style.AppTheme_SlideAnimation);
-        //d = new Dialog(this);
+        ownerDialog = new Dialog(Act, R.style.AppTheme_SlideAnimation);
+        //ownerDialog = new Dialog(this);
     }
 
     private String m_deviceName;
@@ -93,9 +109,9 @@ public class TimeInActivity extends AppCompatActivity {
 
     private void initReader() {
         try {
-            Context applContext = getApplicationContext();
 
-            deviceName = getIntent().getExtras().getString("device_name");
+            //deviceName = getIntent().getExtras().getString("device_name");
+            deviceName = getArguments().getString("device_name");
             m_deviceName = deviceName;
             m_reader = Globals.getInstance().getReader(m_deviceName, applContext);
 
@@ -104,9 +120,9 @@ public class TimeInActivity extends AppCompatActivity {
             m_engine = UareUGlobal.GetEngine();
 
         } catch (Exception e) {
-
-            onBackPressed();
-            return;
+            //Toast.makeText(applContext, "Reader not found : " + deviceName, Toast.LENGTH_LONG).show();
+            Toast.makeText(applContext, e.toString(), Toast.LENGTH_LONG).show();
+            //setBooleans(false, false, false, true);
         }
     }
 
@@ -123,22 +139,39 @@ public class TimeInActivity extends AppCompatActivity {
         }
     }
 
-    private void setListeners() {
+    private void getUsersAfterFingerprints() {
+        Boolean userListHasValue = tkviewModel.getUserArrayList().getValue() != null;
 
-        tkviewModel.getUserArrayList().observe(this, new Observer<ArrayList<User>>() {
-            @Override
-            public void onChanged(@Nullable ArrayList<User> users) {
+        if (userListHasValue) {
+            if (tkviewModel.getUserArrayList().getValue().size() > 0) {
 
-                if (users != null && users.size() > 0) {
-
-                    hasUsers = true;
-                    runThreadIfDataComplete();
-                } else {
-                    Toast.makeText(getApplicationContext(), "No Users To Search", Toast.LENGTH_LONG).show();
-                    showRetryDialog();
-                }
+                hasUsers = true;
+                runThreadIfDataComplete();
+            } else {
+                Toast.makeText(applContext, "No Users To Search", Toast.LENGTH_LONG).show();
             }
-        });
+        } else {
+
+            tkviewModel.getUsers();
+
+            tkviewModel.getUserArrayList().observe(this, new Observer<ArrayList<User>>() {
+                @Override
+                public void onChanged(@Nullable ArrayList<User> users) {
+
+                    if (users != null && users.size() > 0) {
+
+                        hasUsers = true;
+                        runThreadIfDataComplete();
+                    } else {
+                        Toast.makeText(applContext, "No Users To Search", Toast.LENGTH_LONG).show();
+                        showRetryDialog();
+                    }
+                }
+            });
+        }
+    }
+
+    private void setListeners() {
 
         viewModel.getfmdListConversionResult().observe(this, new Observer<Result>() {
             @Override
@@ -146,7 +179,14 @@ public class TimeInActivity extends AppCompatActivity {
                 if (result != null && result.getStatus().equals("success")) {
 
                     hasFingerprints = true;
-                    tkviewModel.getUsers();
+
+                    ArrayList<User> users = tkviewModel.getUserArrayList().getValue();
+                    if (users != null && users.size() > 0) {
+                        hasUsers = true;
+                        runThreadIfDataComplete();
+                    } else {
+                        getUsersAfterFingerprints();
+                    }
                 } else {
 
                     tv_debugger_text = "";
@@ -165,7 +205,7 @@ public class TimeInActivity extends AppCompatActivity {
                     //showOwner();
                 } else {
                     fingerPrintOwner = null;
-                    Toast.makeText(getApplicationContext(), Static.API_STATUS_FAILED, Toast.LENGTH_LONG).show();
+                    Toast.makeText(applContext, Static.API_STATUS_FAILED, Toast.LENGTH_LONG).show();
                 }
 
                 showOwner();
@@ -178,9 +218,9 @@ public class TimeInActivity extends AppCompatActivity {
 
                 if (result.getStatus().equals(Static.API_STATUS_SUCCESS)) {
 
-                    Toast.makeText(getApplicationContext(), "Time in successful!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(applContext, "Time in successful!", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(applContext, result.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -193,22 +233,22 @@ public class TimeInActivity extends AppCompatActivity {
         UpdateGUI();
     }
 
-    private Dialog d;
+    private Dialog ownerDialog;
     private Helper helper;
 
     private void showOwner() {
 
-        if (d.isShowing()) {
-            d.dismiss();
+        if (ownerDialog.isShowing()) {
+            ownerDialog.dismiss();
         }
 
-        d.setContentView(R.layout.dialog_fingerprint_owner_info);
-        ImageView iv_avatar = d.findViewById(R.id.iv_avatar);
-        TextView tv_fullname = d.findViewById(R.id.tv_fullname);
-        TextView tv_current_time = d.findViewById(R.id.tv_current_time);
-        TextView tv_time_in = d.findViewById(R.id.tv_time_in);
-        TextView tv_time_out = d.findViewById(R.id.tv_time_out);
-        Button btn_clock_in_out = d.findViewById(R.id.btn_clock_in_out);
+        ownerDialog.setContentView(R.layout.dialog_fingerprint_owner_info);
+        ImageView iv_avatar = ownerDialog.findViewById(R.id.iv_avatar);
+        TextView tv_fullname = ownerDialog.findViewById(R.id.tv_fullname);
+        TextView tv_current_time = ownerDialog.findViewById(R.id.tv_current_time);
+        TextView tv_time_in = ownerDialog.findViewById(R.id.tv_time_in);
+        TextView tv_time_out = ownerDialog.findViewById(R.id.tv_time_out);
+        Button btn_clock_in_out = ownerDialog.findViewById(R.id.btn_clock_in_out);
 
         final String time = helper.now();
 
@@ -252,12 +292,12 @@ public class TimeInActivity extends AppCompatActivity {
                     });
                 }
             } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(applContext, e.toString(), Toast.LENGTH_LONG).show();
             }
 
         } else {
 
-            Toast.makeText(getApplicationContext(), "Inangyan!", Toast.LENGTH_LONG).show();
+            Toast.makeText(applContext, "Inangyan!", Toast.LENGTH_LONG).show();
 
             tv_time_in.setText("");
             tv_time_out.setText("");
@@ -267,12 +307,12 @@ public class TimeInActivity extends AppCompatActivity {
             btn_clock_in_out.setText("Cannot clock in");
         }
 
-        d.show();
+        ownerDialog.show();
     }
 
     private void showRetryDialog() {
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(applContext);
         alertDialogBuilder.setTitle("Oops")
                 .setMessage("Something went wrong!\nRetry?")
                 .setCancelable(false)
@@ -285,7 +325,7 @@ public class TimeInActivity extends AppCompatActivity {
                 .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
+                        Toast.makeText(applContext, "Close App", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -359,7 +399,7 @@ public class TimeInActivity extends AppCompatActivity {
                         if (!m_reset) {
                             Log.w("UareUSampleJava", "error during capture: " + e.toString());
                             m_deviceName = "";
-                            onBackPressed();
+                            //onBackPressed();
                         }
                     }
 
@@ -387,7 +427,7 @@ public class TimeInActivity extends AppCompatActivity {
                     }
 
                     final Result finalR = r;
-                    runOnUiThread(new Runnable() {
+                    Act.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             UpdateGUI();
@@ -399,7 +439,7 @@ public class TimeInActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
 
         try {
@@ -407,15 +447,13 @@ public class TimeInActivity extends AppCompatActivity {
             try {
                 m_reader.CancelCapture();
             } catch (Exception e) {
-                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(applContext, e.toString(), Toast.LENGTH_LONG).show();
             }
             m_reader.Close();
         } catch (Exception e) {
 
             Log.w("UareUSampleJava", "error during reader shutdown");
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(applContext, e.toString(), Toast.LENGTH_LONG).show();
         }
     }
-
 }
-

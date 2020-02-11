@@ -13,7 +13,7 @@
 
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/colorWhiteSmoke" />
+            <solid android:color="@android:color/transparent" />
             <stroke android:width="2dp" android:color="#3b91d7" />
             <!-- Set the same value for both width and height to get a circular shape -->
             <size android:width="25dp" android:height="25dp" />

@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -322,7 +323,7 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
         if (innerList != null) {
 
-            findUserResult.postValue(new Result(Static.API_STATUS_SUCCESS, innerList.toString()));
+            //findUserResult.postValue(new Result(Static.API_STATUS_SUCCESS, innerList.toString()));
 
             for (User u : innerList) {
                 if (u.getId().equals(userID)) {
@@ -684,5 +685,16 @@ public class TimekeepingViewModel extends AndroidViewModel {
 
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
         queue.add(jsonObjectRequest);
+    }
+
+    MutableLiveData<Fragment> fragment = new MutableLiveData<>();
+
+    public MutableLiveData<Fragment> getFragment() {
+        return this.fragment;
+    }
+
+    public void addFragment(Fragment f) {
+
+        fragment.setValue(f);
     }
 }

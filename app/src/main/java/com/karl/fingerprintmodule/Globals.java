@@ -119,4 +119,8 @@ public class Globals {
         Reader.Capabilities caps = reader.GetCapabilities();
         return caps.resolutions[0];
     }
+
+    public static Boolean register = false;
+
+    public static CaptureResultObservable captureResultObservable;
 }

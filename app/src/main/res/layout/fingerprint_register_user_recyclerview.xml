@@ -1,47 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_sm"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="@dimen/margin_lg"
+        app:cardBackgroundColor="@color/gry700"
         app:cardCornerRadius="3dp"
         app:cardElevation="3dp">
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/margin_sm">
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin_lg"
+            android:gravity="center"
+            android:orientation="vertical">
 
         <ImageView
                 android:id="@+id/iv_user_image"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:contentDescription="TODO"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/margin_sm"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/enter_64px"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_sm"
-                android:layout_marginLeft="@dimen/margin_sm"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/iv_user_image"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+        <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:gravity="center"
+                android:text="Karl M."
+                android:textColor="@color/white"
+                app:autoSizeTextType="uniform" />
 
-            <TextView
-                    android:id="@+id/tv_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Karl Vincent"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/h5" />
-
-        </LinearLayout>
-
-
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 </android.support.v7.widget.CardView>

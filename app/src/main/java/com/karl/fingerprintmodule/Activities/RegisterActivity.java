@@ -20,7 +20,9 @@ import com.digitalpersona.uareu.Engine;
 import com.digitalpersona.uareu.Fid;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.Reader;
+import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
+import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbException;
 import com.karl.fingerprintmodule.Globals;
 import com.karl.fingerprintmodule.Models.User;
 import com.karl.fingerprintmodule.R;
@@ -55,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
         initViews();
 
         initReader();
-        runThread();
+        //runThread();
 
         setListeners();
         viewModel.retrieveFingerPrints();
@@ -99,20 +101,48 @@ public class RegisterActivity extends AppCompatActivity {
     private Engine.Candidate[] results = null;
 
     private void initReader() {
+        Context applContext = getApplicationContext();
+
         try {
-            Context applContext = getApplicationContext();
+
             m_deviceName = getIntent().getExtras().getString("device_name");
+        } catch (Exception e) {
+            Toast.makeText(this, "No Reader Name", Toast.LENGTH_LONG).show();
+
+        }
+
+
+        try {
             m_reader = Globals.getInstance().getReader(m_deviceName, applContext);
             m_reader.Open(Reader.Priority.EXCLUSIVE);
-            m_DPI = Globals.GetFirstDPI(m_reader);
-            m_engine = UareUGlobal.GetEngine();
+            runThread();
+        } catch (UareUException DFE) {
+            DFE.printStackTrace();
 
-        } catch (Exception e) {
+            if (DFE.getCode() == DPFPDDUsbException.URU_E_DEVICE_BUSY) {
+                Toast.makeText(this, "Yay", Toast.LENGTH_LONG).show();
 
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-            //onBackPressed();
-            return;
+                try {
+                    m_reader.CancelCapture();
+                    m_reader.Close();
+                    m_reader.Open(Reader.Priority.EXCLUSIVE);
+                    runThread();
+                } catch (UareUException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Yaw padin!", Toast.LENGTH_LONG).show();
+                }
+
+                runThread();
+
+            } else {
+                Toast.makeText(this, "Nay", Toast.LENGTH_LONG).show();
+
+            }
+
+            onBackPressed();
         }
+        m_DPI = Globals.GetFirstDPI(m_reader);
+        m_engine = UareUGlobal.GetEngine();
     }
 
     ArrayList<employeeBiometrix> fmdArrayList = new ArrayList<>();
@@ -367,19 +397,20 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        try {
-            m_reset = true;
-            try {
-                m_reader.CancelCapture();
-            } catch (Exception e) {
-                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-            }
-            m_reader.Close();
-        } catch (Exception e) {
-
-            Log.w("UareUSampleJava", "error during reader shutdown");
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-        }
+//        try {
+//            m_reset = true;
+//            try {
+//                Reader.Status i = m_reader.GetStatus();
+//                m_reader.CancelCapture();
+//            } catch (Exception e) {
+//                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+//            }
+//            m_reader.Close();
+//        } catch (Exception e) {
+//
+//            Log.w("UareUSampleJava", "error during reader shutdown");
+//            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+//        }
     }
 }
 

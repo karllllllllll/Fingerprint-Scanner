@@ -2,7 +2,8 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/gry900">
 
     <ScrollView
             android:layout_width="match_parent"
@@ -12,10 +13,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_lg"
+                android:background="@color/gry900"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="0.0px"
+                app:cardBackgroundColor="@color/gry900"
                 app:cardElevation="@dimen/card_elevation"
                 app:cardPreventCornerOverlap="false"
                 app:elevation="@dimen/card_elevation">
@@ -26,70 +29,119 @@
                     android:layout_margin="@dimen/margin_sm"
                     android:orientation="vertical">
 
-                <LinearLayout
+                <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/margin_sm"
-                        android:orientation="vertical">
+                        android:layout_marginBottom="10dp"
+                        android:text="PIN Input"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/h3P5" />
 
-                    <ImageView
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginTop="@dimen/margin_xxl"
-                            android:layout_marginBottom="@dimen/margin_xxl"
-                            android:contentDescription="@string/todo" />
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:text="Use your PIN to clock in/out"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/h5" />
 
+                <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stretchColumns="*">
 
-                    <TableLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal">
+                    <TableRow>
 
-                        <TableRow>
+                        <ImageView
+                                android:id="@+id/iv_avatar"
+                                android:layout_width="150dp"
+                                android:layout_height="150dp"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="@dimen/margin_xxl"
+                                android:layout_marginBottom="@dimen/margin_xxl"
+                                android:contentDescription="@string/todo" />
+
+                        <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_xxl"
+                                android:orientation="vertical">
 
                             <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/time_in"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h5" />
-
-                            <TextView
-                                    android:id="@+id/tv_time_in"
+                                    android:id="@+id/tv_name"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="@dimen/margin_sm"
                                     android:layout_marginLeft="@dimen/margin_sm"
-                                    android:text="@string/sample_time_am"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h5"
-                                    android:textStyle="bold" />
-                        </TableRow>
-
-                        <TableRow>
-
-                            <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
                                     android:gravity="center"
-                                    android:text="@string/time_out"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h5" />
+                                    android:text="Karl Vincent"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/h4"
+                                    android:textStyle="bold" />
 
                             <TextView
-                                    android:id="@+id/tv_time_out"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="@dimen/margin_sm"
                                     android:layout_marginLeft="@dimen/margin_sm"
-                                    android:text="@string/sample_time_out"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h5"
-                                    android:textStyle="bold" />
-                        </TableRow>
-                    </TableLayout>
-                </LinearLayout>
+                                    android:layout_marginBottom="@dimen/margin_xxl"
+                                    android:gravity="center"
+                                    android:text="Employee"
+                                    android:textColor="@color/white"
+                                    android:textSize="@dimen/h5" />
+
+                            <TableLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal">
+
+                                <TableRow>
+
+                                    <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:text="@string/time_in"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/h5" />
+
+                                    <TextView
+                                            android:id="@+id/tv_time_in"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginStart="@dimen/margin_sm"
+                                            android:layout_marginLeft="@dimen/margin_sm"
+                                            android:text="@string/sample_time_am"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/h5"
+                                            android:textStyle="bold" />
+                                </TableRow>
+
+                                <TableRow>
+
+                                    <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:gravity="center"
+                                            android:text="@string/time_out"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/h5" />
+
+                                    <TextView
+                                            android:id="@+id/tv_time_out"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="@dimen/margin_sm"
+                                            android:layout_marginLeft="@dimen/margin_sm"
+                                            android:text="@string/sample_time_out"
+                                            android:textColor="@color/white"
+                                            android:textSize="@dimen/h5"
+                                            android:textStyle="bold" />
+                                </TableRow>
+                            </TableLayout>
+                        </LinearLayout>
+
+                    </TableRow>
+                </TableLayout>
 
                 <TextView
                         android:layout_width="match_parent"
@@ -97,14 +149,15 @@
                         android:layout_marginBottom="@dimen/margin_sm"
                         android:gravity="center"
                         android:text="@string/please_enter_your_pin"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/h5"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/h4"
                         android:textStyle="bold" />
 
                 <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="@dimen/margin_xxl"
                         android:orientation="horizontal">
 
                     <ImageView
@@ -160,8 +213,9 @@
                                     android:layout_height="wrap_content"
                                     android:gravity="center"
                                     android:text="@string/_1"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                             <Button
                                     android:id="@+id/numpad_2"
@@ -170,8 +224,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_2"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                             <Button
                                     android:id="@+id/numpad_3"
@@ -180,8 +235,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_3"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
                         </TableRow>
 
                         <TableRow>
@@ -193,8 +249,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_4"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                             <Button
                                     android:id="@+id/numpad_5"
@@ -203,8 +260,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_5"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                             <Button
                                     android:id="@+id/numpad_6"
@@ -213,8 +271,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_6"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
                         </TableRow>
 
                         <TableRow>
@@ -226,8 +285,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_7"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                             <Button
                                     android:id="@+id/numpad_8"
@@ -236,8 +296,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_8"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                             <Button
                                     android:id="@+id/numpad_9"
@@ -246,8 +307,9 @@
                                     android:contentDescription="@string/todo"
                                     android:gravity="center"
                                     android:text="@string/_9"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                         </TableRow>
 
@@ -273,8 +335,9 @@
                                     android:layout_height="wrap_content"
                                     android:gravity="center"
                                     android:text="@string/_0"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/h3P5" />
+                                    android:textColor="@color/lightBlue"
+                                    android:textSize="@dimen/h2"
+                                    app:backgroundTint="@color/gry800" />
 
                             <LinearLayout
                                     android:id="@+id/numpad_send"

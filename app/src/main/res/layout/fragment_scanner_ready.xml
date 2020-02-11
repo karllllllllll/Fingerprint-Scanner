@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gry900">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <ImageView
+                    android:id="@+id/iv_more"
+                    android:layout_margin="@dimen/margin_lg"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_more_vert_white_24dp" />
+        </FrameLayout>
+
+        <com.skyfishjy.library.RippleBackground
+                android:id="@+id/rb_animation"
+                android:layout_width="match_parent"
+                android:layout_height="669dp"
+                android:layout_centerInParent="true"
+                app:rb_color="#0099CC"
+                app:rb_duration="3000"
+                app:rb_radius="32dp"
+                app:rb_rippleAmount="10"
+                app:rb_scale="6" />
+
+        <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/iv_fingerprint"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Kiosk"
+                android:textColor="@color/white"
+                android:textSize="@dimen/h3"
+                tools:layout_editor_absoluteX="24dp" />
+
+
+        <ImageView
+                android:id="@+id/iv_fingerprint"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_fingerprint_white_24dp" />
+
+        <TextView
+                android:id="@+id/tv_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/iv_fingerprint"
+                android:gravity="center"
+                android:text="Place your finger on top of the scanner"
+                android:textColor="@color/white"
+                android:textSize="@dimen/h4" />
+
+    </RelativeLayout>
+
+
+</android.support.constraint.ConstraintLayout>

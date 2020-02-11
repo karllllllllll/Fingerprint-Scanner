@@ -2,10 +2,9 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@color/gry900"
         android:padding="20dp">
 
     <LinearLayout
@@ -22,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="Registration"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/h3P5" />
 
         <TextView
@@ -30,13 +29,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="Register your fingerprint"
+                android:textColor="@color/white"
                 android:textSize="@dimen/h5" />
 
 
         <ImageView
                 android:id="@+id/iv_avatar"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="20dp"
                 android:contentDescription="TODO"
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Karl Vincent"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="20sp" />
 
         <TextView
@@ -57,6 +57,7 @@
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
                 android:text="Employee"
+                android:textColor="@color/white"
                 android:textSize="20sp" />
 
         <TextView
@@ -65,8 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:gravity="center"
-                android:text="Place your thumb on the device"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="20sp" />
 
         <ImageView
@@ -75,8 +75,9 @@
                 android:layout_height="324dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="20dp"
-                android:contentDescription="TODO"
-                android:scaleType="fitXY" />
+                android:contentDescription="@string/todo"
+                android:scaleType="fitXY"
+                android:visibility="visible" />
 
 
         <TextView

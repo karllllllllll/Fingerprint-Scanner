@@ -15,6 +15,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.digitalpersona.uareu.Engine;
 import com.digitalpersona.uareu.Fmd;
+import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.UareUException;
 import com.digitalpersona.uareu.UareUGlobal;
 import com.karl.fingerprintmodule.Models.User;
@@ -96,7 +97,6 @@ public class FmdViewModel extends AndroidViewModel {
                     public void onResponse(JSONObject response) {
 
                         createFMDList(response);
-                        //Toast.makeText(app.getBaseContext(), response.toString(), Toast.LENGTH_LONG).show();
                     }
                 }, new Response.ErrorListener() {
 
@@ -160,7 +160,8 @@ public class FmdViewModel extends AndroidViewModel {
                 uidList = innerIDList;
 
                 getfmdListConversionResult().setValue(new Result("success", ""));
-                //Toast.makeText(app.getBaseContext(), Arrays.toString(uidList), Toast.LENGTH_LONG).show();
+
+                Toast.makeText(app.getBaseContext(), "Fingerprints Ready", Toast.LENGTH_LONG).show();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -311,6 +312,19 @@ public class FmdViewModel extends AndroidViewModel {
 
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(Static.DEFAULT_TIMEOUT_MS, Static.DEFAULT_MAX_RETRIES, Static.DEFAULT_BACKOFF_MULT));
         queue.add(jsonObjectRequest);
+    }
+
+    private MutableLiveData<Reader.CaptureResult> currentCapResult = new MutableLiveData<>();
+
+    public MutableLiveData<Reader.CaptureResult> getCurrentCapResult(){
+        return this.currentCapResult;
+    }
+
+    public void setCurrentCapResult(Reader.CaptureResult cr) {
+
+        Toast.makeText(app.getApplicationContext(),cr.image.getCbeffId(),Toast.LENGTH_LONG).show();
+
+        currentCapResult.postValue(cr);
     }
 }
 

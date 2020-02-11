@@ -66,7 +66,20 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.MyViewHolder
 
         User user = mDataset.get(position);
 
-        holder.textView.setText(user.getF_name() + " " + user.getL_name());
+        String fullName = user.getF_name() + " " + user.getL_name();
+
+        int space_pos = user.getF_name().indexOf(" ");
+        int size =user.getF_name().length();
+        String fname = user.getF_name();
+        String initial = String.valueOf(user.getL_name().charAt(0));
+        String name = fname + " " + initial+".";
+
+        if (space_pos > 0) {
+            fname = user.getF_name().substring(space_pos, size);
+            name = fname + " " + initial+".";
+        }
+
+        holder.textView.setText(name);
 
         Glide.with(fragment)
                 .load(user.getImage_path())

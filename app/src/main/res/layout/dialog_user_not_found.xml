@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#272727"
+            android:orientation="vertical">
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/margin_xxl">
+
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:src="@drawable/enter_64px" />
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/margin_sm"
+                            android:layout_marginLeft="@dimen/margin_sm"
+                            android:text="Unknown Fingerprint!"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/h4" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/margin_xl"
+                android:stretchColumns="1">
+
+            <TableRow android:gravity="center">
+
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="@dimen/margin_sm"
+                        android:layout_marginLeft="@dimen/margin_sm"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                    <ImageView
+                            android:id="@+id/iv_avatar"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/ic_cancel_red_24dp" />
+
+                    <TextView
+                            android:id="@+id/tv_fullname"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="User not found"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/h4"
+                            android:textStyle="bold" />
+
+                </LinearLayout>
+            </TableRow>
+        </TableLayout>
+
+        <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/margin_xl"
+                android:stretchColumns="*">
+
+
+            <TableRow android:gravity="center">
+
+                <android.support.v7.widget.CardView
+                        android:id="@+id/cv_register"
+                        android:layout_width="wrap_content"
+                        android:layout_height="75dp"
+                        android:layout_margin="@dimen/margin_sm"
+                        android:textColor="@color/white"
+                        app:cardBackgroundColor="@color/lightBlue">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Register"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/h4" />
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                        android:id="@+id/cv_use_pin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="75dp"
+                        android:layout_margin="@dimen/margin_sm"
+                        android:textColor="@color/white"
+                        app:cardBackgroundColor="@color/success">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Use PIN"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/h4" />
+                </android.support.v7.widget.CardView>
+
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>
